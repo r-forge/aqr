@@ -10,11 +10,11 @@
 
 
 \usage{
-        aqLoadOHLC("CNX.MDI.EUR/USD", "HOURS_1",  20120601, 20120901, con)
+        aqLoadOHLC(seriesId, freq, startDate, endDate, con)
 }
 \arguments{
-\item{seriesId}{}
-\item{timeFrame}{the granularity, must be one of RAW, MINUTES_1, ... EOD, EOM, EOW. }
+\item{seriesId}{the series Id}
+\item{freq}{the granularity, must be one of RAW, MINUTES_1, ... EOD, EOM, EOW. }
 \item{startDate}{start date in YYYYMMDD format}
 \item{endDate}{end date in YYYYMMDD format}
 \item{con}{optional - an AQMS configuration - defaults to a call aqInit() if not specified. }

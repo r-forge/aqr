@@ -8,7 +8,7 @@
 
 
 \usage{
-	aqStoreSeriesField(seriesId, fieldId,freq, data, con) 
+	aqStoreSeriesField(seriesId, fieldId,freq, data, con = aqInit(), silent=FALSE) 
 }
 \arguments{
 \item{seriesId}{the name of the series}
@@ -16,6 +16,7 @@
 \item{freq}{the frequency}
 \item{data}{a data object, preferrably a zoo object}
 \item{con}{an optional connectivity object}
+\item{silent}{whether the function should print the server's status message or not}
 }
 \examples{
 \dontrun{

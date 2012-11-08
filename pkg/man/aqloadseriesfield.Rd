@@ -8,7 +8,7 @@
 
 
 \usage{
-	aqLoadSeriesField(...)
+	aqLoadSeriesField(seriesId, fieldId, freq, startDate, endDate, con)
 }
 \arguments{
 \item{seriesId}{the name of the series}

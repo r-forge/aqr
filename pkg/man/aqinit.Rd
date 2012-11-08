@@ -6,21 +6,17 @@
 }
 
 
-
 \usage{
 	aqInit()
-}
-\arguments{
-\item{tsHost}{optional - the AQMS timeseries server host address}
-\item{envir}{optional - the AQMS timeseries server port}
 }
 \examples{
 \dontrun{
 	# creates a default configuration
 	con = aqInit()
 	
-	# creates a con object to a specific AQMS
-	con = aqInit(tsHost = "127.0.0.1", tsPort = 44444)
+	# set the the tshost to a specific AQMS
+	con$tsHost = "127.0.0.1"
+	con$tsHost = 21231
 
 	
 }
