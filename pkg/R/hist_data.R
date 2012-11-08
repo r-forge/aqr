@@ -1,3 +1,8 @@
+buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
+  url = paste("http://", con$tsHost, ":", con$tsPort,"/csv/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=",field,"&STARTDATE=", startDate, "&ENDDATE=",endDate, sep="")
+  return(url)
+}
+
 aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
@@ -5,11 +10,11 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){
 	}
 	 
 	# load the individual columns.table 
-	open = read.csv(paste("http://", con$tsHost, ":", con$tsPort,"/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=OPEN&STARTDATE=", startDate, "&ENDDATE=",endDate, sep=""))
-	high = read.csv(paste("http://", con$tsHost, ":", con$tsPort,"/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=HIGH&STARTDATE=", startDate, "&ENDDATE=",endDate, sep=""))
-	low = read.csv(paste("http://", con$tsHost, ":", con$tsPort,"/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=LOW&STARTDATE=", startDate, "&ENDDATE=",endDate, sep=""))
-	close = read.csv(paste("http://", con$tsHost, ":", con$tsPort,"/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=CLOSE&STARTDATE=", startDate, "&ENDDATE=",endDate, sep=""))
-	volume = read.csv(paste("http://", con$tsHost, ":", con$tsPort,"/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=VOLUME&STARTDATE=", startDate, "&ENDDATE=",endDate, sep=""))
+	open = read.csv(buildArchiveURL(con, seriesId, "OPEN", freq, startDate, endDate))
+	high = read.csv(buildArchiveURL(con, seriesId, "HIGH", freq, startDate, endDate))
+	low = read.csv(buildArchiveURL(con, seriesId, "LOW", freq, startDate, endDate))
+	close = read.csv(buildArchiveURL(con, seriesId, "CLOSE", freq, startDate, endDate))
+	volume = read.csv(buildArchiveURL(con, seriesId, "VOLUME", freq, startDate, endDate))
 	# convert everything to XTS. 
 	if(nrow(volume)==0)
 		volume = NA 
@@ -35,7 +40,7 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 		stop("AQConfig list not configured properly.")
 	}
 
-	data = read.csv(paste("http://", con$tsHost, ":", con$tsPort,"/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=",fieldId,"&STARTDATE=", startDate, "&ENDDATE=",endDate, sep=""))
+	data = read.csv(read.csv(buildArchiveURL(con, seriesId, fieldId, freq, startDate, endDate))
 	if(nrow(data)>0){
 		dataXts = xts(data, order.by=as.POSIXct(data[,1]/1000000000, origin="1970/01/01"))
 		return(dataXts)
@@ -43,5 +48,19 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 	else{
 		return(NA)
 	}
+}
+
+aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
+	require(RCurl)	
+	convertedData =capture.output(write.table(data, row.names=FALSE,  col.names=FALSE,quote=FALSE, sep=","))
+	response = postForm(paste("http://", con$tsHost, ":", con$tsPort, "/csv/", sep=""), 
+		SERIESID=seriesId,
+		FIELD = fieldId, 
+		FREQ = freq, 
+		DATA = convertedData, style="httppost")
+	if(!silent){
+	  cat(rawToChar(response))
+	}
+	
 }
 
