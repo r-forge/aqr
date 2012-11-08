@@ -39,9 +39,9 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 		stop("AQConfig list not configured properly.")
 	}
 
-	data = read.csv(buildArchiveURL(con, seriesId, fieldId, freq, startDate, endDate))
+	data <- read.csv(buildArchiveURL(con, seriesId, fieldId, freq, startDate, endDate))
 	if(nrow(data)>0){
-		dataXts = xts(data, order.by=as.POSIXct(data[,1]/1000000000, origin="1970/01/01"))
+		dataXts = xts(data[,3], order.by=as.POSIXct(data[,1]/1000000000, origin="1970/01/01"))
 		return(dataXts)
 	}
 	else{
@@ -50,10 +50,27 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 
 }
 
+# this function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)
 aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
 	require(RCurl)	
-	convertedData =capture.output(write.table(data, row.names=FALSE,  col.names=FALSE,quote=FALSE, sep=","))
-	response = postForm(paste("http://", con$tsHost, ":", con$tsPort, "/csv/", sep=""), 
+	# let's check if we have a zoo object. 
+
+	if(ncol(data)>2){
+	  cat("Only the first data column will be stored\n")
+	}
+  
+	toBeStored <- c()
+	if(sum(class(data)=="zoo")>0){
+	  # convert it to nano seconds. 
+	  toBeStored <- cbind(as.numeric(index(data))*1000000000, data[,1])
+	}
+	else{
+	  toBeStored = data[,1:2]
+	}
+	
+
+	convertedData <- capture.output(write.table(format(toBeStored, scientific=FALSE), row.names=FALSE,  col.names=FALSE,quote=FALSE, sep=","))
+	response <- postForm(paste("http://", con$tsHost, ":", con$tsPort, "/csv/", sep=""), 
 		SERIESID=seriesId,
 		FIELD = fieldId, 
 		FREQ = freq, 
@@ -61,6 +78,6 @@ aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), si
 	if(!silent){
 	  cat(rawToChar(response))
 	}
-	
+	return(rawToChar(response))
 }
 
