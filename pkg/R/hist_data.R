@@ -33,14 +33,13 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){
 	}
 }
 
-
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
 		stop("AQConfig list not configured properly.")
 	}
 
-	data = read.csv(read.csv(buildArchiveURL(con, seriesId, fieldId, freq, startDate, endDate))
+	data = read.csv(buildArchiveURL(con, seriesId, fieldId, freq, startDate, endDate))
 	if(nrow(data)>0){
 		dataXts = xts(data, order.by=as.POSIXct(data[,1]/1000000000, origin="1970/01/01"))
 		return(dataXts)
@@ -48,6 +47,7 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 	else{
 		return(NA)
 	}
+
 }
 
 aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
