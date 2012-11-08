@@ -23,11 +23,13 @@
         \code{\link{aqInit}}.
 }
 \examples{
+\dontrun{
         # creates a default configuration
         con = aqInit()
         # load data 
         EURUSD = aqLoadOHLC("CNX.MDI.EUR/USD", "HOURS_1",  20120601, 20120901, con)
-
 }
-\keyword{initialization}
+}
+
+\keyword{fetching time series data}
 

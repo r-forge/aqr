@@ -15,6 +15,7 @@
 \item{envir}{optional - the AQMS timeseries server port}
 }
 \examples{
+\dontrun{
 	# creates a default configuration
 	con = aqInit()
 	
@@ -22,6 +23,6 @@
 	con = aqInit(tsHost = "127.0.0.1", tsPort = 44444)
 
 	
-
+}
 }
 \keyword{initialization}
