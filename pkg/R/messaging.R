@@ -33,7 +33,7 @@ aqSendMessage <- function(channel, message){
 }
 
 aqTestCallToDynLib<- function(testMessage){
-  return .Call("testCall", testMessage)
+  return(.Call("testCall", testMessage))
 }
 
 
