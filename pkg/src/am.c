@@ -342,13 +342,6 @@ void processMessage(char* incomingMessage){
 
 
 
-static void killReceiver(int signum){
-  printf("Cleaning up child process due to signal %d\n", signum);
-//   printf("Cleaning up child process %d. \n", receiverForkPid);
-  if(connected==0x01){
-  //   kill( receiverForkPid, SIGKILL );
-  }
-}
 
 void* receiverThreadCode(){
  	// child process code. 
@@ -405,20 +398,7 @@ void startConnection(){
   if(connected == 0x01){
       // ok connected. 
       printf("Connected. Forking off a message receiver. \n");
-      
-      
-      // register the sigint listeners. 
-      if (signal(SIGTERM, killReceiver) == SIG_ERR) {
-        printf("2 An error occurred while setting a signal handler.\n");
-      }
-      if (signal(SIGHUP, killReceiver) == SIG_ERR) {
-        printf("3 An error occurred while setting a signal handler.\n");
-      }
-      if (signal(SIGINT, killReceiver) == SIG_ERR) {
-        printf("4 An error occurred while setting a signal handler.\n");
-      }
-      
-      
+            
       // fork/pthread it from here. Cupid. 
       pthread_t thread; 
       int rc; 
