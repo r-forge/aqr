@@ -36,8 +36,10 @@
 #include <Rinternals.h>
 
 
-
+// maximum amount of channels for this subscriber. Setting it to 100 for now. 
 #define MAX_CHANNELS 100
+
+// maximum channel buffer. Total memory consumption = buffer length * max channels. So, take care. 
 #define BUFFER_LENGTH 4096 * 5
 
 char* subscribedChannels[MAX_CHANNELS];
