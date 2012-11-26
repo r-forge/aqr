@@ -53,18 +53,20 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 # this function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)
 aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
 	require(RCurl)	
-	# let's check if we have a zoo object. 
 
 	if(ncol(data)>2){
-	  cat("Only the first data column will be stored\n")
+	  warning("Only the first data column will be stored.")
 	}
   
 	toBeStored <- c()
+	# let's check if we have a zoo object. 
 	if(sum(class(data)=="zoo")>0){
 	  # convert it to nano seconds. 
 	  toBeStored <- cbind(as.numeric(index(data))*1000000000, data[,1])
 	}
 	else{
+	  # 
+	  warning("No zoo object. First column assumed to be timestamp in nanoseconds and second column assumed to contain data series.") 
 	  toBeStored = data[,1:2]
 	}
 	

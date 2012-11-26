@@ -5,6 +5,7 @@
  * 
  * Enjoying the Dishonored Soundtracks (f.e. http://www.youtube.com/watch?v=Fsak_zSyKjM&feature=related ). 
  * 
+ * Spent more time on a Monday morning. 
  * 
  * Code by The Ghost Rider. 
  * 
@@ -415,7 +416,7 @@ void unsubscribe(const char* channel){
   }
 }
 
-
+// open the socket connection. 
 void openSocketConnection(){
   struct sockaddr_in serv_addr;
   struct hostent *server;
@@ -448,6 +449,7 @@ void closeSocketConnection(){
   
 }
 
+// utility function to initialize the AQ-R part. 
 void initialize(){
   printf("Initializing AQ-R C part. \n");
   initialized = 1; 
@@ -464,7 +466,7 @@ void initialize(){
   startConnection();
 }
 
-//
+// utility function to check if we are subscribed already. 
 int alreadySubscribed(const char* channel){
   for(int i=0;i<MAX_CHANNELS;i++){
     if(subscribedChannels[i]!=0x00){
@@ -480,7 +482,7 @@ int alreadySubscribed(const char* channel){
 
 
 
-SEXP aqPoll(){
+SEXP aqPollAll(){
   SEXP Rresult;  
   // get the mutex on our channel list. 
   
@@ -491,6 +493,28 @@ SEXP aqPoll(){
 }
 
 
+SEXP aqPollChannel(SEXP channel){
+  SEXP Rresult;  
+  // get the mutex on our channel list. 
+  
+  
+  
+  // 
+  return Rresult; 
+}
+
+// waits for data and returns a list of channels for which data is available. 
+// this is a synchronous call and thus blocks. 
+SEXP aqWaitForData(){
+  SEXP Rresult;  
+  // get the mutex on our channel list. 
+  
+  
+  
+  // 
+  return Rresult;  
+  
+}
 
 
 //aqSubscribe is a synchronous call which will open a connection upon start. 
