@@ -3,11 +3,13 @@
 ############
 
 aqInitMessaging <- function(){
-  dyn.load(paste("am", .Platform$dynlib.ext, sep=""))
+  # dyn.load(paste("am", .Platform$dynlib.ext, sep=""))
+  #library.dynam("am",package=c("aqr")) 
+  
 }
 
 aqSubscribeChannel <- function(channel){
-  .Call("aqSubscribe", paste("/topic/", channel, sep=""))
+  .Call("aqSubscribe", paste("/topic/", channel, sep=""), PACKAGE="aqr")
 }
 
 aqUnsubscribeChannel <- function(channel){

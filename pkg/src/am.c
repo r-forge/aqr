@@ -58,15 +58,16 @@ char* buildConnectMsg(){
 }
 
 
-char* buildSubscribeMsg(const char* topicName, const char* selector){
+char* buildSubscribeMsg(const char* topicName, const char* selector, const char* id){
   char msgPart1[] = "SUBSCRIBE\ndestination: ";  
+  char msgPart1_1[] = "id: ";
   char msgPart2[] = "selector: ";
   char msgPart3[] = "\n\n";  
   char newLine[] = "\n";
   
   
   // make it one character longer to capture the zero byte. 
-  size_t strlength = strlen(msgPart1) + strlen(topicName) + strlen(msgPart2) + 1;
+  size_t strlength = strlen(msgPart1) + strlen(topicName) + strlen(msgPart1_1) + strlen(id) + strlen(msgPart2) + 2 + 2;
   
   if(selector != 0x00){
     printf("Subscribing with selector \n");
@@ -80,6 +81,9 @@ char* buildSubscribeMsg(const char* topicName, const char* selector){
     
   strcpy(ret, msgPart1);
   strcat(ret, topicName);
+  strcat(ret, newLine);
+  strcat(ret, msgPart1_1);
+  strcat(ret, id);
   
   if(selector!=0x00){
     strcat(ret, newLine);
@@ -87,19 +91,34 @@ char* buildSubscribeMsg(const char* topicName, const char* selector){
     strcat(ret, selector);
   }
   
+  strcat(ret, msgPart3);  
+  return ret;
+}
+
+const char* buildUnsubscribeMsg(char* id){
+  char msgPart1[] = "UNSUBSCRIBE\n";  
+  char msgPart2[] = "id: ";
+  char msgPart3[] = "\n\n";  
+  char newLine[] = "\n";
+  
+  
+  // make it one character longer to capture the zero byte. 
+  size_t strlength = strlen(msgPart1) + strlen(id) + strlen(msgPart2) + 1 + 3;
+    
+  //
+  char* ret = (char*)Calloc(strlength, char);
+  // zero it out. 
+  bzero(ret, strlength);
+    
+  strcpy(ret, msgPart1);
+  strcat(ret, msgPart2);
+  strcat(ret, id);
+  strcat(ret, newLine);  
   strcat(ret, msgPart3);
   
   return ret;
 }
 
-const char* buildUnsubscribeMsg(){
-  
-}
-
-
-void* listener(void* arg){
-	// start a connection ... 			
-}
 
 void stopConnection(){
   connected = 0x00; 
@@ -390,7 +409,9 @@ void subscribe(const char* channel){
       subscribedChannels[i] = Calloc(strlen(channel), char);
       strcpy(subscribedChannels[i], channel);
       //
-      char* msg = buildSubscribeMsg(channel, 0x00);
+      char id [ 5 ];
+      sprintf(id, "%d", i);
+      char* msg = buildSubscribeMsg(channel, 0x00, id);
       printf("Subscription message:\n>%s<\n", msg);      
       int n = write(socketFileDescriptor,msg,strlen(msg));  
       flush();          
@@ -410,7 +431,14 @@ void unsubscribe(const char* channel){
     if(subscribedChannels[i] != 0x00){
       int result = strncmp(subscribedChannels[i], channel, 100);
       if(result==0){
-	// ok, channel subscription found
+	// ok, channel found. let's unsubscribe. 
+	char id [ 5 ];
+	sprintf(id, "%d", i);
+	const char* msg = buildUnsubscribeMsg(id);
+	printf("Unsubscribe message:\n>%s<\n", msg);      
+	int n = write(socketFileDescriptor,msg,strlen(msg));  
+	flush();          
+	Free(msg);     
       }     
     }
   }
@@ -437,7 +465,7 @@ void openSocketConnection(){
          server->h_length);
   serv_addr.sin_port = htons(tcpTargetPort);
   if (connect(socketFileDescriptor,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
-      error("AQ-R could not connect to %s:%d", tcpTargetHost, tcpTargetPort);      
+      error("AQ-R could not connect to STOMP connector at %s:%d", tcpTargetHost, tcpTargetPort);      
   }  
   // 
   printf("AQ-R connected successfully to %s:%d\n", tcpTargetHost, tcpTargetPort);  
@@ -562,6 +590,8 @@ SEXP aqSubscribe(SEXP channel){
 
 // arguments in R come in over S-Expressions
 SEXP aqUnsubscribe(SEXP channel){
+  SEXP Rresult;
+
   if(!isString(channel)){
     error("channel must be a string.");
   }
@@ -569,13 +599,25 @@ SEXP aqUnsubscribe(SEXP channel){
   if(initialized==0){
       initialize();      
   }    
+
+  
+  
+  
+  PROTECT(Rresult = NEW_CHARACTER(1));
   PROTECT(channel = AS_CHARACTER(channel));
+
   char* name; 
   name = R_alloc(strlen(CHAR(STRING_ELT(channel, 0))), sizeof(char));
   strcpy(name, CHAR(STRING_ELT(channel, 0)));
   unsubscribe(name);
-  UNPROTECT(1);
 
+  
+  SET_STRING_ELT(Rresult, 0, mkChar("Unsubscribed."));
+
+  //
+  UNPROTECT(2);
+  // UNPROTECT(1);
+  return Rresult;
 }
 
 
