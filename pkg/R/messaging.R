@@ -24,6 +24,12 @@ aqDataReady <- function(){
   return(.Call("aqDataReady"))
 }
 
+
+aqWaitForData <- function(){
+  return(.Call("aqWaitForData"))
+}
+
+
 aqPollChannel <- function(channel){
   .Call("aqPollChannel", channel)
 }

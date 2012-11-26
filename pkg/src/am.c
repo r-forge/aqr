@@ -52,8 +52,6 @@ pthread_mutex_t dataReadyMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t dataReadyCond = PTHREAD_COND_INITIALIZER; 
 
 
-
-
 // using stomp 1.0
 char* buildConnectMsg(){
   char* msg;
@@ -288,6 +286,8 @@ void processMessage(char* incomingMessage){
 	  // lock the mutex. 
 	  pthread_mutex_lock (&varLock);
 
+	  
+	  
 	  printf("Channel buffer found.\n");
 	  //ok, channel found. append do channel buffer. 	  
 	  int currentBufferLength = strlen(individualChannelBuffers[i]); 
@@ -309,6 +309,16 @@ void processMessage(char* incomingMessage){
   	  // unlock the mutex. 
 	  pthread_mutex_unlock (&varLock);
 
+	  // signal data ready. 
+	  pthread_mutex_lock(&dataReadyMutex);
+	  dataReady=1; 
+	  pthread_cond_signal(&dataReadyCond);
+	  pthread_mutex_unlock(&dataReadyMutex);
+	  
+	  // 
+	  
+	  
+	  
 	  // mark channel as very dirty. 
 	}
       }
@@ -553,10 +563,13 @@ SEXP aqPollChannel(SEXP channel){
 SEXP aqWaitForData(){
   SEXP Rresult;  
   // get the mutex on our channel list. 
-  
-  
-  
-  // 
+  PROTECT(Rresult = NEW_CHARACTER(1));
+  pthread_mutex_lock(&dataReadyMutex);
+  while(dataReady==0)  
+	  pthread_cond_wait(&dataReadyCond, &dataReadyMutex);
+  pthread_mutex_unlock(&dataReadyMutex);  
+  SET_STRING_ELT(Rresult, 0, mkChar("data ready."));
+  UNPROTECT(1);
   return Rresult;  
   
 }
