@@ -14,7 +14,7 @@ aqUnsubscribeChannel <- function(channel){
   .Call("aqUnsubscribe", paste("/topic/", channel, sep=""))
 }
 
-aqPollAll <- function(){
+aqPoll <- function(){
   return(.Call("aqPollAll"))
 }
 
@@ -28,11 +28,11 @@ aqWaitForData <- function(){
   return(.Call("aqWaitForData"))
 }
 
-aqPollChannel <- function(channel){
-  .Call("aqPollChannel", channel)
-}
+#aqPollChannel <- function(channel){
+#.Call("aqPollChannel", channel)
+#}
 
-aqSendMessage <- function(channel, message){
+aqSend <- function(channel, message){
   .Call("aqSend", paste("/topic/", channel, sep=""), message)
 }
 

@@ -36,6 +36,13 @@
 #include <Rinternals.h>
 
 
+// defining the debug printf. 
+#ifdef __DEBUG__ 
+  #define	DPRINTF(f,...)	fprintf(stderr,f,##__VA_ARGS__) 
+#else 
+  #define	DPRINTF(f,...) 
+#endif 
+
 // maximum amount of channels for this subscriber. Setting it to 100 for now. 
 #define MAX_CHANNELS 100
 
@@ -85,7 +92,7 @@ char* buildSubscribeMsg(const char* topicName, const char* selector, const char*
   size_t strlength = strlen(msgPart1) + strlen(topicName) + strlen(msgPart1_1) + strlen(id) + strlen(msgPart2) + 2 + 2;
   
   if(selector != 0x00){
-    printf("Subscribing with selector \n");
+    DPRINTF("Subscribing with selector \n");
     strlength = strlength + strlen(msgPart2) + strlen(newLine) + strlen(selector);    
   }
     
@@ -135,6 +142,34 @@ const char* buildUnsubscribeMsg(char* id){
 }
 
 
+
+const char* buildSendMsg(char* channel, char* message){
+  char msgPart1[] = "SEND\n";  
+  char msgPart2[] = "destination: ";
+  char msgPart3[] = "\n\n";  
+  char newLine[] = "\n";
+  
+  
+  // make it one character longer to capture the zero byte. 
+  size_t strlength = strlen(msgPart1) + strlen(msgPart2) + strlen(channel) + 1 + 1 + strlen(message) + 1 + 1 + 1;
+    
+  // allocate it. has to be Freed later on. 
+  char* ret = (char*)Calloc(strlength, char);
+  // zero it out. 
+  bzero(ret, strlength);
+    
+  strcpy(ret, msgPart1);
+  strcat(ret, msgPart2);
+  strcat(ret, channel);
+  strcat(ret, msgPart3);  
+  strcat(ret, message);
+  // strcat(ret, newLine);
+  
+  return ret;
+}
+
+
+
 void stopConnection(){
   connected = 0x00; 
 }
@@ -157,7 +192,7 @@ char* readMessage(){
   bzero(readByte, 1); 
   int readCounter = 0; 
   int n = 0; 
-  // printf("Reading one byte.\n");
+  // DPRINTF("Reading one byte.\n");
   n = read(socketFileDescriptor, readByte, 1);
   if (n < 0)
     error("ERROR reading from socket");    
@@ -168,7 +203,7 @@ char* readMessage(){
   unsigned char endSignalled;
   endSignalled = 0; 
   while(readByte!='\0' && readCounter < 4096){  
-    // printf("Read byte\n");
+    // DPRINTF("Read byte\n");
     // let's append this lovely tiny byte. 
     n = read(socketFileDescriptor, readByte, 1);
     if (n < 0)
@@ -184,11 +219,11 @@ char* readMessage(){
     else{	
       // no endbyte. 
       buffer[readCounter] = *readByte; 
-      // printf("%d %d %s\n", *readByte, n, buffer);    
+      // DPRINTF("%d %d %s\n", *readByte, n, buffer);    
       readCounter++; 
     }
   }  
-  printf("Read %d bytes. %s\n",readCounter, buffer);
+  DPRINTF("Read %d bytes. %s\n",readCounter, buffer);
   return(buffer);
 }
 
@@ -207,34 +242,34 @@ char* getMessageBody(char* incomingMessage){
     currentByte = incomingMessage[pos];
     if(currentByte!='\n' && currentByte != 0x00){
       lineBuffer[linePos] = currentByte;     
-      // printf("Current line: %d %d\n", pos, currentByte);
+      // DPRINTF("Current line: %d %d\n", pos, currentByte);
       linePos ++; 
     }
     else {
       linePos = 0; 
-      // printf("new line\n");
-      // printf("%d  %s\n", strlen(lineBuffer), lineBuffer);
+      // DPRINTF("new line\n");
+      // DPRINTF("%d  %s\n", strlen(lineBuffer), lineBuffer);
       if(strlen(lineBuffer)==0){
-	// printf("body start detected\n");
+	// DPRINTF("body start detected\n");
 	// new line received. body starting. 
 	inBody = 0x01; 
       }
       else{
-	// printf("f1\n");
+	// DPRINTF("f1\n");
 	if(inBody == 0x00){
-	  // printf("f2\n");
+	  // DPRINTF("f2\n");
 	    // not in body, thus zero out line.
 	    bzero(lineBuffer, 4096); 	    
 	}
 	else{
-	  // printf("f3\n");
+	  // DPRINTF("f3\n");
 	    // in body. new line is treated as part of body.  
 	    if(strlen(body)==0){
-	      // printf("f4\n");
+	      // DPRINTF("f4\n");
 	      strcpy(body, lineBuffer);
 	    }
 	    else{
-	      // printf("f5\n");
+	      // DPRINTF("f5\n");
 	      strcat(body, "\n"); 
 	      strcat(body, lineBuffer);
 	    }
@@ -271,7 +306,7 @@ char* getMessageCommand(char* incomingMessage){
 	if(currentByte == 0x00)
 	  break; 
       }
-      printf("command: >%s<\n", lineBuffer);
+      DPRINTF("command: >%s<\n", lineBuffer);
       return lineBuffer;
 }
 
@@ -283,7 +318,7 @@ void processMessage(char* incomingMessage){
     //char* channel = getChannel(incomingMessage);
     char* msgBody = getMessageBody(incomingMessage);
     int msgLength = strlen(msgBody); 
-    printf("Received message >%s<\n", msgBody); 
+    DPRINTF("Received message >%s<\n", msgBody); 
     // 
     
     // append the message body to the channel's buffer so that R can poll it later on.     
@@ -291,17 +326,17 @@ void processMessage(char* incomingMessage){
     // find the right channel. 
     for(int i=0;i<MAX_CHANNELS;i++){    
       if(subscribedChannels[i] != 0x00){
-	printf("channel with subscription found: %s\n", subscribedChannels[i]);
+	DPRINTF("channel with subscription found: %s\n", subscribedChannels[i]);
 	if(strcmp(subscribedChannels[i], channel)==0){
 	  // lock the mutex. 
 	  pthread_mutex_lock (&varLock);
 
 	  
 	  
-	  printf("Channel buffer found.\n");
+	  DPRINTF("Channel buffer found.\n");
 	  //ok, channel found. append do channel buffer. 	  
 	  int currentBufferLength = strlen(individualChannelBuffers[i]); 
-	  printf("Current buffer length: %d vs msg length %d\n", currentBufferLength, msgLength);
+	  DPRINTF("Current buffer length: %d vs msg length %d\n", currentBufferLength, msgLength);
 	  if(currentBufferLength==0 && msgLength < BUFFER_LENGTH ){
 	    strcpy(individualChannelBuffers[i], msgBody);
 	    strcat(individualChannelBuffers[i], "\n");
@@ -313,7 +348,7 @@ void processMessage(char* incomingMessage){
 	      strcat(individualChannelBuffers[i], "\n");
 	    }
 	    else{
-	      printf("ALERT: Dropping message due to full buffer. \n");
+	      DPRINTF("ALERT: Dropping message due to full buffer. \n");
 	    }
 	  }
   	  // unlock the mutex. 
@@ -351,7 +386,7 @@ void* receiverThreadCode(){
 	  if(getppid()==1)
 	    exit(0);
 	  
-	  printf("Receiver still running. \n");
+	  DPRINTF("Receiver still running. \n");
 	  char* readMsg = readMessage();		  
 	  
 	  processMessage(readMsg);
@@ -369,7 +404,7 @@ void startConnection(){
   int n; 
   // 
   char* msg;msg = buildConnectMsg();
-  printf("Sending out: %s\n", msg);
+  DPRINTF("Sending out: %s\n", msg);
   // send the welcome message. 
   n = write(socketFileDescriptor,msg,strlen(msg));  
   flush();    
@@ -379,7 +414,7 @@ void startConnection(){
   char* cmd; cmd = getMessageCommand(readMsg);
   
   if(strcmp(cmd, "CONNECTED")==0){
-     printf("Connected\n");
+     DPRINTF("Connected\n");
      connected = 0x01;      
   }
   else{
@@ -387,7 +422,7 @@ void startConnection(){
   }
   
   // 
-  printf("Processed. \n");
+  DPRINTF("Processed. \n");
     
   // cleanup. 
   Free(cmd);
@@ -397,7 +432,7 @@ void startConnection(){
   // 
   if(connected == 0x01){
       // ok connected. 
-      printf("Connected. Forking off a message receiver. \n");
+      DPRINTF("Connected. Forking off a message receiver. \n");
             
       // fork/pthread it from here. Cupid. 
       pthread_t thread; 
@@ -414,12 +449,12 @@ void startConnection(){
 
 
 void subscribe(const char* channel){
-  printf("Subscribing to channel >%s<\n", channel);
+  DPRINTF("Subscribing to channel >%s<\n", channel);
   // now that we are here ... let's add this channel. 
   for(int i=0;i<MAX_CHANNELS;i++){    
     if(subscribedChannels[i] == 0x00){
       // free slot found. 
-      printf("Using slot %d\n", i); 
+      DPRINTF("Using slot %d\n", i); 
       // 
       subscribedChannels[i] = Calloc(strlen(channel), char);
       strcpy(subscribedChannels[i], channel);
@@ -427,7 +462,7 @@ void subscribe(const char* channel){
       char id [ 5 ];
       sprintf(id, "%d", i);
       char* msg = buildSubscribeMsg(channel, 0x00, id);
-      printf("Subscription message:\n>%s<\n", msg);      
+      DPRINTF("Subscription message:\n>%s<\n", msg);      
       int n = write(socketFileDescriptor,msg,strlen(msg));  
       flush();          
       Free(msg);
@@ -441,7 +476,7 @@ void subscribe(const char* channel){
 
 //
 void unsubscribe(const char* channel){
-  printf("Unsubscribe from channel >%s<\n", channel);
+  DPRINTF("Unsubscribe from channel >%s<\n", channel);
   for(int i=0;i<MAX_CHANNELS;i++){    
     if(subscribedChannels[i] != 0x00){
       int result = strncmp(subscribedChannels[i], channel, 100);
@@ -450,7 +485,7 @@ void unsubscribe(const char* channel){
 	char id [ 5 ];
 	sprintf(id, "%d", i);
 	const char* msg = buildUnsubscribeMsg(id);
-	printf("Unsubscribe message:\n>%s<\n", msg);      
+	DPRINTF("Unsubscribe message:\n>%s<\n", msg);      
 	int n = write(socketFileDescriptor,msg,strlen(msg));  
 	flush();          
 	Free(msg);     
@@ -483,20 +518,19 @@ void openSocketConnection(){
       error("AQ-R could not connect to STOMP connector at %s:%d", tcpTargetHost, tcpTargetPort);      
   }  
   // 
-  printf("AQ-R connected successfully to %s:%d\n", tcpTargetHost, tcpTargetPort);  
+  DPRINTF("AQ-R connected successfully to %s:%d\n", tcpTargetHost, tcpTargetPort);  
 }
 
 void closeSocketConnection(){
   if(socketFileDescriptor!=0x00)
-    close(socketFileDescriptor); 
-  
+    close(socketFileDescriptor);  
 }
 
 
 
 // utility function to initialize the AQ-R part. 
 void initialize(){
-  printf("Initializing AQ-R C part. \n");
+  DPRINTF("Initializing AQ-R C part. \n");
   initialized = 1; 
   // initialize the channel array. 
   for(int i=0;i<MAX_CHANNELS;i++){
@@ -666,7 +700,7 @@ SEXP aqSubscribe(SEXP channel){
   const char* name; 
   PROTECT(channel = AS_CHARACTER(channel));
   name = CHAR(STRING_ELT(channel, 0));
-  printf("%s\n", name);
+  DPRINTF("%s\n", name);
   // 
   PROTECT(Rresult = NEW_CHARACTER(1));
   if(alreadySubscribed(name)==0)
@@ -689,6 +723,41 @@ SEXP aqSubscribe(SEXP channel){
 }
 
 
+SEXP aqSend(SEXP channel, SEXP message){
+  // 
+  SEXP Rresult = R_NilValue;   
+  // 
+  // buildSendMsg(channel
+  
+  if(!isString(channel)){
+    error("aqSend: channel must be a string.");
+  }
+  if(!isString(message)){
+    error("aqSend: message must be a string.");
+  }
+  
+  // converted. 
+  char* chan; 
+  chan = R_alloc(strlen(CHAR(STRING_ELT(channel, 0))), sizeof(char));
+  strcpy(chan, CHAR(STRING_ELT(channel, 0)));
+  
+  char* msg; 
+  msg = R_alloc(strlen(CHAR(STRING_ELT(message, 0))), sizeof(char));
+  strcpy(msg, CHAR(STRING_ELT(message, 0)));
+  
+  
+    // ...   
+  const char* sendBuffer = buildSendMsg(chan, msg);  
+  DPRINTF("Message: >%s<", sendBuffer);
+  int n = write(socketFileDescriptor,sendBuffer,strlen(sendBuffer));  
+  flush();            
+  Free(sendBuffer);   
+
+  
+  //
+  // 
+  return Rresult;
+}
 
 // arguments in R come in over S-Expressions
 SEXP aqUnsubscribe(SEXP channel){
