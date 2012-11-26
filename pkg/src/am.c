@@ -6,27 +6,35 @@
  * Enjoying the Dishonored Soundtracks (f.e. http://www.youtube.com/watch?v=Fsak_zSyKjM&feature=related ). 
  * 
  * Spent more time on a Monday morning. And a monday afternoon. 
+ * It's getting dark. Listening to Kirlian Camera, Not Of This World, Edges. 
  * 
  * Code by The Ghost Rider. 
  * 
  ********/
 
-#include <stdio.h>   /* printf, stderr, fprintf */
-#include <sys/types.h> /* pid_t */
-#include <unistd.h>  /* _exit, fork */
-#include <stdlib.h>  /* exit */
-#include <errno.h>   /* errno */
-#include <sys/socket.h>
-#include <netinet/in.h>
+
+// STD INCLUDES. 
+#include <errno.h>  
+
 #include <netdb.h>
-#include <signal.h>
+#include <netinet/in.h>
 
 #include <pthread.h>
 
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h> 
 
+#include <sys/socket.h>
+#include <sys/types.h> 
+
+#include <unistd.h> 
+
+// R INCLUDES FOLLOW
 #include <R.h>
-#include <Rinternals.h>
 #include <Rdefines.h>
+#include <Rinternals.h>
+
 
 
 #define MAX_CHANNELS 100
