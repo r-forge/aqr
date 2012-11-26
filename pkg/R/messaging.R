@@ -15,7 +15,7 @@ aqUnsubscribeChannel <- function(channel){
 }
 
 aqPollAll <- function(){
-  .Call("aqPollAll")
+  return(.Call("aqPollAll"))
 }
 
 # waits for data and returns a list of channels for which data is available. 
@@ -24,11 +24,9 @@ aqDataReady <- function(){
   return(.Call("aqDataReady"))
 }
 
-
 aqWaitForData <- function(){
   return(.Call("aqWaitForData"))
 }
-
 
 aqPollChannel <- function(channel){
   .Call("aqPollChannel", channel)

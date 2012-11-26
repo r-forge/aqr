@@ -538,9 +538,52 @@ int alreadySubscribed(const char* channel){
 
 
 SEXP aqPollAll(){
-  SEXP Rresult;  
-  // get the mutex on our channel list. 
+  SEXP Rresult = R_NilValue; 
+
   
+   // 
+  // count all channels for which there is data. 
+  // lock the mutex. 
+  pthread_mutex_lock (&varLock);
+  // 
+  int channelsWithDataCount = 0; 
+  // go over all channels and check if there is data. 
+  for(int i=0;i<MAX_CHANNELS;i++){
+    if(subscribedChannels[i]!=0x00){
+      // 
+      int currentBufferLength = strlen(individualChannelBuffers[i]); 
+      if(currentBufferLength>0)
+	channelsWithDataCount++; 
+    }
+  } 
+  
+  // result contains in the first column the channel name and in the second column the actual data set. 
+  PROTECT(Rresult = allocMatrix(STRSXP, channelsWithDataCount, 2));
+  int channelCounter = 0; 
+  for(int i=0;i<MAX_CHANNELS;i++){
+    if(subscribedChannels[i]!=0x00){
+      // 
+      SET_STRING_ELT(Rresult, channelCounter * 2, mkChar(subscribedChannels[i]));
+      SET_STRING_ELT(Rresult, channelCounter * 2 + 1, mkChar(individualChannelBuffers[i]));
+      // wipe the individualChannelBuffers so that they can carry data again. 
+      bzero(individualChannelBuffers[i], BUFFER_LENGTH); 
+      
+      // 
+      channelCounter++;       
+    }
+  } 
+  
+  // 
+  UNPROTECT(1);  
+  
+  // 
+  // clear the data ready flag. 
+  pthread_mutex_lock(&dataReadyMutex);
+  dataReady = 0; 
+  pthread_mutex_unlock(&dataReadyMutex);  
+  
+  // unlock the mutex. 
+  pthread_mutex_unlock (&varLock);  
   
   
   // 
@@ -551,8 +594,7 @@ SEXP aqPollAll(){
 SEXP aqPollChannel(SEXP channel){
   SEXP Rresult;  
   // get the mutex on our channel list. 
-  
-  
+
   
   // 
   return Rresult; 
@@ -575,7 +617,7 @@ SEXP aqWaitForData(){
 }
 
 /**
- * sexpression contains channel list with ready data. 
+ * s-expression contains channel list with ready data. 
  */
 SEXP aqDataReady(){
   // 
@@ -584,7 +626,7 @@ SEXP aqDataReady(){
   // count all channels for which there is data. 
   // lock the mutex. 
   pthread_mutex_lock (&varLock);
-   
+  // 
   int channelsWithDataCount = 0; 
   // go over all channels and check if there is data. 
   for(int i=0;i<MAX_CHANNELS;i++){
@@ -607,13 +649,6 @@ SEXP aqDataReady(){
       
     }
   } 
-  
-  
-  
-  
-  
-  
-  
   
   // 
   UNPROTECT(1);  
