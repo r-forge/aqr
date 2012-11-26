@@ -3,9 +3,7 @@
 ############
 
 aqInitMessaging <- function(){
-  # dyn.load(paste("am", .Platform$dynlib.ext, sep=""))
-  #library.dynam("am",package=c("aqr")) 
-  
+
 }
 
 aqSubscribeChannel <- function(channel){
@@ -22,8 +20,8 @@ aqPollAll <- function(){
 
 # waits for data and returns a list of channels for which data is available. 
 # this is a synchronous call and thus blocks. 
-aqWaitForData <- function(){
-  .Call("aqWaitForData")
+aqDataReady <- function(){
+  return(.Call("aqDataReady"))
 }
 
 aqPollChannel <- function(channel){
@@ -38,6 +36,3 @@ aqTestCallToDynLib<- function(testMessage){
   return(.Call("testCall", testMessage))
 }
 
-
-
-# .Call("aqSubscribe", 20)

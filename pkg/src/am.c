@@ -5,7 +5,7 @@
  * 
  * Enjoying the Dishonored Soundtracks (f.e. http://www.youtube.com/watch?v=Fsak_zSyKjM&feature=related ). 
  * 
- * Spent more time on a Monday morning. 
+ * Spent more time on a Monday morning. And a monday afternoon. 
  * 
  * Code by The Ghost Rider. 
  * 
@@ -30,6 +30,7 @@
 
 
 #define MAX_CHANNELS 100
+#define BUFFER_LENGTH 4096 * 5
 
 char* subscribedChannels[MAX_CHANNELS];
 char* individualChannelBuffers[MAX_CHANNELS];
@@ -44,6 +45,12 @@ char connected = 0x00;
 
 // lock across all threads 
 pthread_mutex_t varLock = PTHREAD_MUTEX_INITIALIZER;
+
+// dataRedy mutex , see Stevens, 1997, Unix Network Programming, p. 627
+int dataReady; 
+pthread_mutex_t dataReadyMutex = PTHREAD_MUTEX_INITIALIZER; 
+pthread_cond_t dataReadyCond = PTHREAD_COND_INITIALIZER; 
+
 
 
 
@@ -260,33 +267,38 @@ char* getMessageCommand(char* incomingMessage){
       return lineBuffer;
 }
 
-
-
-
 void processMessage(char* incomingMessage){
   // first, process the message type 
   char* msgType = getMessageCommand(incomingMessage); 
   if(strcmp(msgType, "MESSAGE")==0){
       // message received. get the body 
-    // char* channelId = getChanne(incomingMessage);
+    //char* channel = getChannel(incomingMessage);
     char* msgBody = getMessageBody(incomingMessage);
-    printf("Received message: >%s<", msgBody); 
+    int msgLength = strlen(msgBody); 
+    printf("Received message >%s<\n", msgBody); 
+    // 
     
     // append the message body to the channel's buffer so that R can poll it later on.     
-    char* channel = "TEXT"; 
+    char* channel = "/topic/TEXT"; 
     // find the right channel. 
     for(int i=0;i<MAX_CHANNELS;i++){    
       if(subscribedChannels[i] != 0x00){
+	printf("channel with subscription found: %s\n", subscribedChannels[i]);
 	if(strcmp(subscribedChannels[i], channel)==0){
-	  //ok, channel found. append do channel buffer. 
-	  int strlength = strlen(individualChannelBuffers[i]); 
-	  if(strlength==0){
+	  // lock the mutex. 
+	  pthread_mutex_lock (&varLock);
+
+	  printf("Channel buffer found.\n");
+	  //ok, channel found. append do channel buffer. 	  
+	  int currentBufferLength = strlen(individualChannelBuffers[i]); 
+	  printf("Current buffer length: %d vs msg length %d\n", currentBufferLength, msgLength);
+	  if(currentBufferLength==0 && msgLength < BUFFER_LENGTH ){
 	    strcpy(individualChannelBuffers[i], msgBody);
 	    strcat(individualChannelBuffers[i], "\n");
 	  }
 	  else{
-	    int msgLength = strlen(msgBody); 
-	    if(strlength + msgLength < (4096 * 5)){
+	    
+	    if(currentBufferLength + msgLength < (BUFFER_LENGTH)){
 	      strcat(individualChannelBuffers[i], msgBody);
 	      strcat(individualChannelBuffers[i], "\n");
 	    }
@@ -294,6 +306,9 @@ void processMessage(char* incomingMessage){
 	      printf("ALERT: Dropping message due to full buffer. \n");
 	    }
 	  }
+  	  // unlock the mutex. 
+	  pthread_mutex_unlock (&varLock);
+
 	  // mark channel as very dirty. 
 	}
       }
@@ -477,6 +492,8 @@ void closeSocketConnection(){
   
 }
 
+
+
 // utility function to initialize the AQ-R part. 
 void initialize(){
   printf("Initializing AQ-R C part. \n");
@@ -486,9 +503,9 @@ void initialize(){
     subscribedChannels[i] = Calloc(strlen("\0"), char);    
     subscribedChannels[i] = 0x00;
     // initialize also the channel buffer. 
-    individualChannelBuffers[i] = (char*)Calloc(4096 * 5, char);  
+    individualChannelBuffers[i] = (char*)Calloc(BUFFER_LENGTH, char);  
     //zero it. 
-    bzero(individualChannelBuffers[i], 4096 * 5); 
+    bzero(individualChannelBuffers[i], BUFFER_LENGTH); 
   }
   openSocketConnection();
   startConnection();
@@ -544,6 +561,53 @@ SEXP aqWaitForData(){
   
 }
 
+/**
+ * sexpression contains channel list with ready data. 
+ */
+SEXP aqDataReady(){
+  // 
+  SEXP Rresult = R_NilValue;    
+  // 
+  // count all channels for which there is data. 
+  // lock the mutex. 
+  pthread_mutex_lock (&varLock);
+   
+  int channelsWithDataCount = 0; 
+  // go over all channels and check if there is data. 
+  for(int i=0;i<MAX_CHANNELS;i++){
+    if(subscribedChannels[i]!=0x00){
+      // 
+      int currentBufferLength = strlen(individualChannelBuffers[i]); 
+      if(currentBufferLength>0)
+	channelsWithDataCount++; 
+    }
+  } 
+  
+  // 
+  PROTECT(Rresult = allocMatrix(STRSXP, channelsWithDataCount, 1));
+  int channelCounter = 0; 
+  for(int i=0;i<MAX_CHANNELS;i++){
+    if(subscribedChannels[i]!=0x00){
+      // 
+      SET_STRING_ELT(Rresult, channelCounter, mkChar(subscribedChannels[i]));
+      channelCounter++; 
+      
+    }
+  } 
+  
+  
+  
+  
+  
+  
+  
+  
+  // 
+  UNPROTECT(1);  
+  // unlock the mutex. 
+  pthread_mutex_unlock (&varLock);  
+  return Rresult;    
+}
 
 //aqSubscribe is a synchronous call which will open a connection upon start. 
 //arguments in R come in over S-Expressions
