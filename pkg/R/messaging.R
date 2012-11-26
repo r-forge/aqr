@@ -28,11 +28,11 @@ aqPollChannel <- function(channel){
   .Call("aqPollChannel", channel)
 }
 
-aqSendMessage(channel, message){
+aqSendMessage <- function(channel, message){
   .Call("aqSend", paste("/topic/", channel, sep=""), message)
 }
 
-aqTestCallToDynLib(testMessage){
+aqTestCallToDynLib<- function(testMessage){
   return .Call("testCall", testMessage)
 }
 
