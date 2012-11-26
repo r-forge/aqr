@@ -36,13 +36,6 @@
 #include <Rinternals.h>
 
 
-// defining the debug printf. Here for the sake of completion. 
-#ifdef __DEBUG__ 
-  #define	DPRINTF(f,...)	fprintf(stderr,f,##__VA_ARGS__) 
-#else 
-  #define	DPRINTF(f,...) 
-#endif 
-
 // maximum amount of channels for this subscriber. Setting it to 100 for now. 
 #define MAX_CHANNELS 100
 
@@ -79,14 +72,17 @@ void debugPrint(const char *fmt, ...)
   va_end(args);
 }
 
-void aqEnableDebugMessages(){
+SEXP aqEnableDebugMessages(){
+  SEXP Rresult = R_NilValue; 
   debugMessagesEnabled = 0x01; 
+  return Rresult;
 }
 
-void aqDisableDebugMessages(){
+SEXP aqDisableDebugMessages(){
+  SEXP Rresult = R_NilValue; 
   debugMessagesEnabled = 0x00; 
+  return Rresult; 
 }
-
 
 
 // using stomp 1.0
@@ -368,7 +364,7 @@ void processMessage(char* incomingMessage){
 	      strcat(individualChannelBuffers[i], "\n");
 	    }
 	    else{	      
-	      fprintf(stderr, "ALERT: SLOW CONSUMER. Dropping message due to full buffer [%s]. \n", channel);
+	      error("ALERT: SLOW CONSUMER. Dropping message due to full buffer [%s]. \n", channel);
 	    }
 	  }
   	  // unlock the mutex. 
@@ -397,24 +393,17 @@ void processMessage(char* incomingMessage){
 
 
 
-
+/**
+ * main receiver loop. 
+ **/
 void* receiverThreadCode(){
  	// child process code. 
 	while(connected == 0x01){
-	  
-	  // check if the parent process died. 
-	  if(getppid()==1)
-	    exit(0);
-	  
-	  debugPrint("Receiver still running. \n");
 	  char* readMsg = readMessage();		  
-	  
 	  processMessage(readMsg);
-	  
 	  Free(readMsg);	  
 	}
-	pthread_exit(0);  
- 
+	pthread_exit(0);   
 }
 
 void startConnection(){

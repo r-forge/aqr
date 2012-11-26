@@ -6,6 +6,14 @@ aqInitMessaging <- function(){
 
 }
 
+aqEnableDebugMessages <- function(){
+  .Call("aqEnableDebugMessages")
+}
+
+aqDisableDebugMessages <- function(){
+  .Call("aqDisableDebugMessages")
+}
+
 aqSubscribeChannel <- function(channel){
   .Call("aqSubscribe", paste("/topic/", channel, sep=""), PACKAGE="aqr")
 }
@@ -28,22 +36,10 @@ aqWaitForData <- function(){
   return(.Call("aqWaitForData"))
 }
 
-#aqPollChannel <- function(channel){
-#.Call("aqPollChannel", channel)
-#}
-
 aqSend <- function(channel, message){
   .Call("aqSend", paste("/topic/", channel, sep=""), message)
 }
 
 aqTestCallToDynLib<- function(testMessage){
   return(.Call("testCall", testMessage))
-}
-
-aqEnableDebugMessages <- function(){
-  .Call("aqEnableDebugMessages", testMessage)
-}
-
-aqDisableDebugMessages <- function(){
-  .Call("aqDisableDebugMessages", testMessage)
 }
