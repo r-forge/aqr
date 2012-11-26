@@ -54,7 +54,7 @@ pthread_cond_t dataReadyCond = PTHREAD_COND_INITIALIZER;
 
 
 
-// using stomp 1.1 
+// using stomp 1.0
 char* buildConnectMsg(){
   char* msg;
   msg = Calloc(200, char);
