@@ -40,3 +40,10 @@ aqTestCallToDynLib<- function(testMessage){
   return(.Call("testCall", testMessage))
 }
 
+aqEnableDebugMessages <- function(){
+  .Call("aqEnableDebugMessages", testMessage)
+}
+
+aqDisableDebugMessages <- function(){
+  .Call("aqDisableDebugMessages", testMessage)
+}
