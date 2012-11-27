@@ -2,7 +2,7 @@
 
 
 aqHourIndex <- function(xtsSeries){
-  ret <- cbind(x, as.POSIXlt(index(x))$hour);
+  ret <- cbind(xtsSeries, as.POSIXlt(index(xtsSeries))$hour);
   colnames(ret) = c("A", "hour");
   return(ret[,2]);
 }
