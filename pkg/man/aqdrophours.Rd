@@ -1,0 +1,23 @@
+\name{aqDropHours}
+\alias{aqDropHours}
+\title{Drop specific hours}
+\description{	
+  This function drops all data for a set of hours from an xts data set. 
+}
+\usage{
+	aqDropHours(x, hours)
+}
+\arguments{
+\item{x}{input xts data set}
+\item{hours}{a set of hours to drop}
+}
+
+\examples{
+\dontrun{
+
+# will drop data between 10h and 12h 
+aqDropHours(anXtsObj, c(10:12))
+}
+}
+
+\keyword{utilities}

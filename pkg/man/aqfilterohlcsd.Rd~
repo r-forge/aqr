@@ -1,0 +1,16 @@
+\name{aqFilterOHLCSD}
+\alias{aqFilterOHLCSD}
+\title{Trivial stdev filter}
+\description{	
+  OHLC data could contain outliers. This function uses a simple stdev data evaluation to clear data outliers. Data outliers are overwritten with the open value. 
+}
+\usage{
+	aqFilterOHLCSD(ohlcv, sdFilterAmount = 10)
+}
+
+\arguments{
+\item{x}{input xts data set}
+\item{hour}{a set of hours to drop}
+}
+
+\keyword{utilities}
