@@ -71,7 +71,7 @@ void debugPrint(const char *fmt, ...)
   if(debugMessagesEnabled==0x00)return; 
   va_list args;
   va_start(args, fmt);
-  vprintf(fmt, args);
+  Rvprintf(fmt, args);
   va_end(args);
 }
 
