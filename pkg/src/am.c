@@ -8,7 +8,7 @@
  * Spent more time on a Monday morning. And a monday afternoon. 
  * It's getting dark. Listening to Kirlian Camera, Not Of This World, Edges. 
  * Making the package ready while listening to XP8, Forgive(N), Das Licht (Imperative Reaction Remix). 
- *  
+ * Tuesday evening. Fixing a stdout. 
  * 
  * Code by The Ghost Rider, November 2012. 
  * 
@@ -64,13 +64,12 @@ int dataReady;
 pthread_mutex_t dataReadyMutex = PTHREAD_MUTEX_INITIALIZER; 
 pthread_cond_t dataReadyCond = PTHREAD_COND_INITIALIZER; 
 
-
 void debugPrint(const char *fmt, ...)
 {
   if(debugMessagesEnabled==0x00)return; 
   va_list args;
   va_start(args, fmt);
-  vprintf(fmt, args);
+  // vprintf(fmt, args);
   va_end(args);
 }
 
