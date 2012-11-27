@@ -2,8 +2,8 @@
 ## Utility functions for sending and receiving real time messages. 
 ############
 
-aqInitMessaging <- function(){
-
+aqInitMessaging <- function(host = "localhost", port = 61618){
+  .Call("aqInit", host, port)
 }
 
 aqEnableDebugMessages <- function(){

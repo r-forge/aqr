@@ -49,7 +49,9 @@ char* individualChannelBuffers[MAX_CHANNELS];
 int subscriptionCount = 0; 
 int initialized = 0; 
 
+// tcp STOMP port
 int tcpTargetPort = 61618; 
+// tcp STOMP host
 char* tcpTargetHost = "localhost";
 int socketFileDescriptor = 0x00;  
 char connected = 0x00; 
@@ -689,6 +691,14 @@ SEXP aqDataReady(){
   // unlock the mutex. 
   pthread_mutex_unlock (&varLock);  
   return Rresult;    
+}
+
+
+SEXP aqInit(SEXP stompHost, SEXP stompPort)
+{
+    SEXP Rresult = R_NilValue;
+    
+    return Rresult; 
 }
 
 //aqSubscribe is a synchronous call which will open a connection upon start. 
