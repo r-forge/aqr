@@ -4,8 +4,6 @@
 \description{
 	Creates an AQ Master Server (AQMS) configuration list. This configuration list object can be passed on to all aqr functions that connect to the AQMS.
 }
-
-
 \usage{
 	aqInit()
 }

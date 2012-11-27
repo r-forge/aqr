@@ -7,8 +7,10 @@
  * 
  * Spent more time on a Monday morning. And a monday afternoon. 
  * It's getting dark. Listening to Kirlian Camera, Not Of This World, Edges. 
+ * Making the package ready while listening to XP8, Forgive(N), Das Licht (Imperative Reaction Remix). 
+ *  
  * 
- * Code by The Ghost Rider. 
+ * Code by The Ghost Rider, November 2012. 
  * 
  ********/
 

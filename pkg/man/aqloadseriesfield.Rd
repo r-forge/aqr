@@ -4,9 +4,6 @@
 \description{
 	Loads a single column time series from the master server. 
 }
-
-
-
 \usage{
 	aqLoadSeriesField(seriesId, fieldId, freq, startDate, endDate, con)
 }
