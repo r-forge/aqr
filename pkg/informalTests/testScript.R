@@ -1,9 +1,9 @@
 # test script for AQ-R
 
 require(aqr)
+aqEnableDebugMessages()
 aqInitMessaging()
 aqSubscribeChannel("TEXT")
-aqEnableDebugMessages()
 aqSend("TEXT", "ABCD")
 
 

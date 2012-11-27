@@ -71,7 +71,7 @@ void debugPrint(const char *fmt, ...)
   if(debugMessagesEnabled==0x00)return; 
   va_list args;
   va_start(args, fmt);
-  // vprintf(fmt, args);
+  vprintf(fmt, args);
   va_end(args);
 }
 
@@ -527,7 +527,7 @@ void openSocketConnection(){
          server->h_length);
   serv_addr.sin_port = htons(tcpTargetPort);
   if (connect(socketFileDescriptor,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
-      error("AQ-R could not connect to STOMP connector at %s:%d", tcpTargetHost, tcpTargetPort);      
+      error("AQ-R could not connect to STOMP connector at %s:%d\n", tcpTargetHost, tcpTargetPort);      
   }  
   // 
   debugPrint("AQ-R connected successfully to %s:%d\n", tcpTargetHost, tcpTargetPort);  
@@ -690,15 +690,30 @@ SEXP aqDataReady(){
   UNPROTECT(1);  
   // unlock the mutex. 
   pthread_mutex_unlock (&varLock);  
-  return Rresult;    
+  return(Rresult);
 }
 
-
+// 
 SEXP aqInit(SEXP stompHost, SEXP stompPort)
-{
-    SEXP Rresult = R_NilValue;
-    
-    return Rresult; 
+{    
+  //   
+  PROTECT(stompHost = AS_CHARACTER(stompHost));  
+  // clear out the tcp target host before ...   
+  // we allocate it again. 
+  tcpTargetHost = R_alloc(strlen(CHAR(STRING_ELT(stompHost, 0))), sizeof(char));  
+  strcpy(tcpTargetHost, CHAR(STRING_ELT(stompHost, 0)));
+
+  // 
+  int port;     
+  PROTECT(stompPort= AS_INTEGER(stompPort));
+  // unclear. Will this persist or might R's GC clear this all up at one point? 
+  port = INTEGER_POINTER(stompPort)[0];
+  tcpTargetPort = port; 
+  debugPrint("Initializing AQ-R messaging with %s:%d\n", tcpTargetHost, tcpTargetPort);
+  
+  // clear the stack. 
+  UNPROTECT(2); 
+  return(R_NilValue); 
 }
 
 //aqSubscribe is a synchronous call which will open a connection upon start. 
