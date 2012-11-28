@@ -2,7 +2,7 @@
 \alias{aqPoll}
 \title{Poll data from the messaging bridge}
 \description{	
-  Used to poll data from the messaging bridge. This function returns all available messages for all channels and empties all buffers in the bridge. As the time of this writing (0.2), individual messages are separated by "\n". In a future version, this function will return a list object. 
+  Used to poll data from the messaging bridge. This function returns all available messages for all channels and empties all buffers in the bridge. As the time of this writing (0.2), individual messages are separated by "\\n". In a future version, this function will return a list object. 
 }
 \usage{
 	aqPoll()

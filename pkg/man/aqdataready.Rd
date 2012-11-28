@@ -5,7 +5,7 @@
   This message retrieves a list of all messaging channels for which there is data. 
   The result set is a list with channel names. 
 
-  This function is a quick call. Unless the aqWaitForData method, this method will not wait for data arrive.  
+  This function is a quick call. Other than the aqWaitForData method, this method will not block until data becomes available. 
 }
 \usage{
 	aqDataReady()
