@@ -10,4 +10,19 @@
 \arguments{
 \item{channel}{one channel name}
 }
+
+
+\examples{
+\dontrun{
+
+>aqSubscribeChannel("R-PROCESSOR-2")
+[1] "Subscribed."
+>
+ 
+}
+}
+
 \keyword{messaging}
+
+
+

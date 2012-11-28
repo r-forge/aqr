@@ -3,7 +3,8 @@
 \alias{aqLoadOHLC}
 \title{Loads a OHLCV data set from AQMS}
 \description{
-        This function loads a Open/High/Low/Close/Volume data set from the AQ Master Server.
+      This function loads a Open/High/Low/Close/Volume data set from the AQ Master Server. 
+      If the master server does not contain data for a specified series Id, it will return an empty xts object. 
 
 }
 

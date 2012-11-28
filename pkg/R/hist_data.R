@@ -15,22 +15,23 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){
 	low = read.csv(buildArchiveURL(con, seriesId, "LOW", freq, startDate, endDate))
 	close = read.csv(buildArchiveURL(con, seriesId, "CLOSE", freq, startDate, endDate))
 	volume = read.csv(buildArchiveURL(con, seriesId, "VOLUME", freq, startDate, endDate))
-	# convert everything to XTS. 
-	if(nrow(volume)==0)
-		volume = NA 
-	else 
-		volume = volume[,3]
-	ohlcv = cbind(open[,3], high[,3], low[,3], close[,3], volume)
- 	if(nrow(ohlcv)>0){
-	  	xtsOhlcv= xts(ohlcv, order.by=as.POSIXct(open[,1]/1000000000, origin="1970/01/01"))
-	  	colnames(xtsOhlcv) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME")
+	if(nrow(high)==nrow(open) && nrow(low) == nrow(open) && nrow(close) == nrow(open) && nrow(open)>0 ){
+	  # convert everything to XTS. 
+	  if(nrow(volume)==0)
+		  volume = NA 
+	  else 
+		  volume = volume[,3]
+	  ohlcv = cbind(open[,3], high[,3], low[,3], close[,3], volume)
+	  if(nrow(ohlcv)>0){
+		  xtsOhlcv= xts(ohlcv, order.by=as.POSIXct(open[,1]/1000000000, origin="1970/01/01"))
+		  colnames(xtsOhlcv) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME")
 
-	  	# 
-		return(xtsOhlcv)
+		  # 
+		  return(xtsOhlcv)
+	  }			
 	}
-	else{	
-		return(NA)
-	}
+	# still here. 
+	return(xts())
 }
 
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
@@ -45,7 +46,7 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 		return(dataXts)
 	}
 	else{
-		return(NA)
+		return(xts())
 	}
 
 }

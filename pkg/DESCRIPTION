@@ -1,11 +1,11 @@
 Package: aqr
 Version: 0.2
 Date: 2012-11-01
-Title: Interface methods to access use an ActiveQuant Master Server
+Title: Interface methods to use with an ActiveQuant Master Server
 Author: Ulrich Staudinger, ActiveQuant GmbH
 Maintainer: Ulrich Staudinger <ustaudinger@activequant.com>
 Depends: R (>= 2.1), xts, RCurl
 Suggests: RCurl
-Description: The ActiveQuant Master Server is a standalone application, this R extension provides methods to use the server from within R. 
+Description: This R extension provides methods to use a standalone ActiveQuant Master Server from within R. Currently available features include fetching and storing historical data, receiving and sending live data.  Several utility methods for simple data transformations are included, too. 
 License: GPL (>= 2)
 URL: http://www.activequant.org
