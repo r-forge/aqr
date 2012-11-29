@@ -42,7 +42,7 @@ candleChart(SAP)
 # we have to clean the column names of quantmod. 
 colnames(MSFT) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME", "ADJUSTED")
 colnames(SAP) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME", "ADJUSTED")
-
+# store them. 
 aqStoreMatrix("myMSFT", "EOD", MSFT)
 aqStoreMatrix("mySAP", "EOD", SAP)
 }
@@ -62,7 +62,8 @@ smaSap = SMA(SAP[,4])
 aqStoreSeriesField("MSFT", "SMA14", "EOD", smaMsft)
 # It should say: Wrote 1478 lines. 
 aqStoreSeriesField("SAP", "SMA14", "EOD", smaSap)
-...
+# let's load the SMA series that we stored. 
+aqLoadSeriesField("MSFT", "SMA14", "EOD", 19900101, 20200101)
 }
 
 

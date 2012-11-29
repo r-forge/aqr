@@ -69,7 +69,7 @@ aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), si
 	# let's check if we have a zoo object. 
 	if(sum(class(data)=="zoo")>0){
 	  # convert it to nano seconds. 
-	  toBeStored <- cbind(as.numeric(index(data))*1000000000000, data[,1])
+	  toBeStored <- cbind(as.numeric(as.POSIXct(index(data))) * 1000000000, data[,1])
 	}
 	else{
 	  # 
