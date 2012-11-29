@@ -39,8 +39,12 @@ getSymbols(c("MSFT", "SAP"))
 # visual check 
 candleChart(MSFT)
 candleChart(SAP)
+# we have to clean the column names of quantmod. 
+colnames(MSFT) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME", "ADJUSTED")
+colnames(SAP) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME", "ADJUSTED")
+
 aqStoreMatrix("myMSFT", "EOD", MSFT)
-aqStoreMatrix("mySAP", "EOD", MSFT)
+aqStoreMatrix("mySAP", "EOD", SAP)
 }
 
 Once data has been stored in AQMS, it is much faster to retrieve data in the future from AQMS than it is to fetch it from Yahoo or Google. Keep in mind that some providers' data usage policies prohibit storing data locally. 
