@@ -307,6 +307,55 @@ char* getMessageBody(char* incomingMessage){
   return body;
 }
 
+
+char* getDestination(char* incomingMessage){
+  debugPrint("Getting destination\n");
+  // get the first line. 
+  char* lineBuffer;lineBuffer = Calloc(4096, char);
+  bzero(lineBuffer,4096);
+  int pos;pos = 0; 
+  int linePos; linePos = 0; 
+  char inBody; inBody = 0x00; 
+  char* destination; destination = Calloc(4096, char); 
+  bzero(destination, 4096);
+  char currentByte;currentByte = 0x00; 
+  
+  while(pos < 4096){	
+    currentByte = incomingMessage[pos];
+    if(currentByte!='\n' && currentByte != 0x00){
+      lineBuffer[linePos] = currentByte;     
+      // debugPrint("Current line: %d %d\n", pos, currentByte);
+      linePos ++; 
+    }
+    else {
+      linePos = 0; 
+      // debugPrint("new line\n");
+      // debugPrint("%d  %s\n", strlen(lineBuffer), lineBuffer);
+      if(strlen(lineBuffer)>12){
+	// check if the line starts with a DESTINATION command. 
+	if(strncmp("destination:", lineBuffer, 5)==0){
+	    // 
+	    memcpy(destination, &lineBuffer[12], strlen(lineBuffer));
+	    debugPrint("Destination extracted: %s\n", destination);
+	}
+      }      
+      // line processing done, zero out the line buffer. 
+      bzero(lineBuffer, 4096); 	    
+
+    }
+    pos++; 
+    // final termination. 
+    if(currentByte == 0x00)
+      break; 
+  }
+  // cleanup, 
+  Free(lineBuffer); 
+  
+  // 
+  return destination;
+}
+
+
 char* getMessageCommand(char* incomingMessage){
   
     // get the first line. 
@@ -339,14 +388,15 @@ void processMessage(char* incomingMessage){
     int msgLength = strlen(msgBody); 
     debugPrint("Received message >%s<\n", msgBody); 
     // 
-    
     // append the message body to the channel's buffer so that R can poll it later on.     
-    char* channel = "/topic/TEXT"; 
+    char* channel = getDestination(incomingMessage);
+
     // find the right channel. 
     for(int i=0;i<MAX_CHANNELS;i++){    
-      if(subscribedChannels[i] != 0x00){
-	debugPrint("channel with subscription found: %s\n", subscribedChannels[i]);
+      if(subscribedChannels[i] != 0x00){	
 	if(strcmp(subscribedChannels[i], channel)==0){
+	  debugPrint("channel with subscription found: %s\n", subscribedChannels[i]);
+	  
 	  // lock the mutex. 
 	  pthread_mutex_lock (&varLock);
 
@@ -389,6 +439,8 @@ void processMessage(char* incomingMessage){
     }    
     // cleanup. 
     Free(msgBody);
+    Free(channel);
+
   }
   Free(msgType);   
 }
@@ -508,16 +560,20 @@ void unsubscribe(const char* channel){
 
 // open the socket connection. 
 void openSocketConnection(){
+  debugPrint("Opening socket connection. \n");
   struct sockaddr_in serv_addr;
   struct hostent *server;
   //   
   socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-  if (socketFileDescriptor < 0) 
+  if (socketFileDescriptor < 0) {
+    debugPrint("Couldn't open socket.\n");
     error("ERROR opening socket");
+  }
   server = gethostbyname(tcpTargetHost);
   // 
   if (server == NULL) {
-      error("No such host.");
+    debugPrint("No such host.\n");
+    error("No such host.");
   }
   bzero((char *) &serv_addr, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
@@ -527,6 +583,7 @@ void openSocketConnection(){
          server->h_length);
   serv_addr.sin_port = htons(tcpTargetPort);
   if (connect(socketFileDescriptor,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
+      debugPrint("AQ-R could not connect to STOMP endpoint.\n");
       error("AQ-R could not connect to STOMP connector at %s:%d\n", tcpTargetHost, tcpTargetPort);      
   }  
   // 
@@ -536,7 +593,7 @@ void openSocketConnection(){
 void closeSocketConnection(){
   if(socketFileDescriptor!=0x00)
     close(socketFileDescriptor);  
-}
+}	
 
 
 
@@ -553,8 +610,12 @@ void initialize(){
     //zero it. 
     bzero(individualChannelBuffers[i], BUFFER_LENGTH); 
   }
+  debugPrint("Channels initialized\n");
   openSocketConnection();
+  debugPrint("Socket connection done, starting connection.\n");
   startConnection();
+  debugPrint("Connection started.\n");
+
 }
 
 // utility function to check if we are subscribed already. 
@@ -589,23 +650,34 @@ SEXP aqPollAll(){
       // 
       int currentBufferLength = strlen(individualChannelBuffers[i]); 
       if(currentBufferLength>0)
+      {
+	      // printf("channel dirty.\n");
+
 	channelsWithDataCount++; 
+      }
     }
   } 
-  
+  // printf("Copying data. \n");
+
   // result contains in the first column the channel name and in the second column the actual data set. 
   PROTECT(Rresult = allocMatrix(STRSXP, channelsWithDataCount, 2));
   int channelCounter = 0; 
   for(int i=0;i<MAX_CHANNELS;i++){
     if(subscribedChannels[i]!=0x00){
       // 
-      SET_STRING_ELT(Rresult, channelCounter * 2, mkChar(subscribedChannels[i]));
-      SET_STRING_ELT(Rresult, channelCounter * 2 + 1, mkChar(individualChannelBuffers[i]));
-      // wipe the individualChannelBuffers so that they can carry data again. 
-      bzero(individualChannelBuffers[i], BUFFER_LENGTH); 
-      
+      // printf("Found a subscribed channel.\n");
       // 
-      channelCounter++;       
+      int currentBufferLength = strlen(individualChannelBuffers[i]); 
+      if(currentBufferLength>0){
+	// printf("buffer length high.\n");
+	SET_STRING_ELT(Rresult, channelCounter * 2, mkChar(subscribedChannels[i]));
+	SET_STRING_ELT(Rresult, channelCounter * 2 + 1, mkChar(individualChannelBuffers[i]));
+	// wipe the individualChannelBuffers so that they can carry data again. 
+	bzero(individualChannelBuffers[i], BUFFER_LENGTH); 
+	
+	// 
+	channelCounter++;
+      }
     }
   } 
   
@@ -763,6 +835,10 @@ SEXP aqSend(SEXP channel, SEXP message){
   SEXP Rresult = R_NilValue;   
   // 
   // buildSendMsg(channel
+    // 
+  if(initialized==0){
+      initialize();
+  }
   
   if(!isString(channel)){
     error("aqSend: channel must be a string.");

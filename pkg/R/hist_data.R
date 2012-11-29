@@ -34,6 +34,12 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){
 	return(xts())
 }
 
+aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE){
+  for(i in colnames(data)){
+    aqStoreSeriesField(seriesId, i, freq, data[,i], con, silent);
+  }
+}
+
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
