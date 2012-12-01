@@ -25,6 +25,26 @@ aqHourlyStat <- function(x, f = mean){
 }
 
 
+
+# applies a function to all values per weekday. 
+aqDayOfWeekStat <- function(x, f = mean){
+    dowIndex = as.POSIXlt(index(x))$wday
+    dows = c(0:6)
+    dailyMatrix = c()
+    for(i in dows){
+      dataSlot = x[dowIndex==i]
+      val = NA
+      if(nrow(dataSlot)>0){
+	val = apply(dataSlot, 2, f)	
+      }
+      dailyMatrix = rbind(dailyMatrix, c(i, val))
+    }
+    return(dailyMatrix)
+}
+
+
+
+
 aqFilterOHLCSD <- function(ohlcv, sdFilterAmount = 10){
   sdLowToOpen = apply(ohlcv[,1] - ohlcv[,2], 2, sd) * sdFilterAmount
   sdHighToOpen = apply(ohlcv[,1] - ohlcv[,3], 2, sd) * sdFilterAmount 
