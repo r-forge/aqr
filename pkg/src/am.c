@@ -24,12 +24,12 @@
   #ifdef HAVE_UNISTD_H
     #include <unistd.h>
   #endif
-  #ifdef HAVE_BSD_NETWORKING
+  
     #include <netdb.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
-  #endif
+  
 #endif
 
 #include <pthread.h>
@@ -661,7 +661,7 @@ void closeSocketConnection(){
     close(socketFileDescriptor);
     #if defined(WIN32)
     	WSACleanup();
-	#endif
+    #endif
   }
 }
 
