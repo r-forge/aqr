@@ -223,7 +223,8 @@ void localSend(const char* msg)
 			strlen(msg),	// Length of data
 		0);
 #else
-	write(socketFileDescriptor,msg,strlen(msg));
+	int n = write(socketFileDescriptor,msg,strlen(msg));
+	debugPrint("Wrote %d bytes\n", n);
 #endif
 }
 
@@ -235,7 +236,8 @@ void flush(){
 		2,	// Length of data
 		0);
 #else
-	write(socketFileDescriptor,"\0\n",2);
+	int n = write(socketFileDescriptor,"\0\n",2);
+	debugPrint("Wrote %d bytes\n", n);
 #endif
 }
 
