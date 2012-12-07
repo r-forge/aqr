@@ -510,6 +510,7 @@ void* receiverThreadCode(){
 	  Free(readMsg);
 	}
 	pthread_exit(0);
+	return(0x00);
 }
 
 
