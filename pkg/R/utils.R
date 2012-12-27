@@ -1,6 +1,5 @@
 # Utility functions from AQ-R
 
-
 aqHourIndex <- function(xtsSeries){
   ret <- cbind(xtsSeries, as.POSIXlt(index(xtsSeries))$hour);
   colnames(ret) = c("A", "hour");
@@ -66,3 +65,54 @@ aqDropHours <- function(x, hours){
   }
   return(ret)
 }
+
+
+
+#' method to generate a pnl curve from a running position. 
+#' bids, asks and running position must have the same length. 
+#' Can compute the pnl from one price to the other, but only for one asset! Does not take time into account. 
+#' 
+#' @param bidPrices an array of bid prices
+#' @param askPrices an array of ask prices
+#' @param runningPosition an array that contains a vector of the position
+#' 
+#' @return This function returns a plain double array with pnl changes and not an XTS series.
+#' 
+#' @note all input arrays must have the same length. 
+generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FALSE)
+{
+        # checks if the length of bid, ask and running position are equally long.
+        if(messages)message("Generating PNL curve.")
+        if(length(bidPrices) == length(askPrices) && length(askPrices) == length(runningPosition))
+        {       
+                .C("c_generatePnlCurve", as.double(bidPrices), as.double(askPrices), as.double(runningPosition), as.integer(length(bidPrices)), pnl = double(length(bidPrices)))$pnl
+        }
+        else
+        {
+                # throw an error.
+                simpleError("Arrays must have the same length", "generatePnlCurve")
+        }
+}
+
+approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosition, messages=FALSE)
+{
+        # checks if the length of bid, ask and running position are equally long.
+        if(messages){
+	  message("Generating PNL curve.")
+	  message(high, "/", low, "/", close, "/", takeProfit, "/" , stopLoss, "/", runningPosition)
+	}
+	
+        if(length(high) == length(runningPosition))
+        {       
+                x = .C("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
+		    pnl = double(length(high)), position = double(length(high)))		
+		return(cbind(x$pnl, x$position))
+        }
+        else
+        {
+                # throw an error.
+                simpleError("Arrays must have the same length", "approximateSLTP")
+        }
+}
+
+
