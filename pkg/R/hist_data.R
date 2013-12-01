@@ -10,11 +10,11 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){
 	}
 	 
 	# load the individual columns.table 
-	open = read.csv(buildArchiveURL(con, seriesId, "OPEN", freq, startDate, endDate))
-	high = read.csv(buildArchiveURL(con, seriesId, "HIGH", freq, startDate, endDate))
-	low = read.csv(buildArchiveURL(con, seriesId, "LOW", freq, startDate, endDate))
-	close = read.csv(buildArchiveURL(con, seriesId, "CLOSE", freq, startDate, endDate))
-	volume = read.csv(buildArchiveURL(con, seriesId, "VOLUME", freq, startDate, endDate))
+	open = read.csv(buildArchiveURL(con, seriesId, con$openField, freq, startDate, endDate))
+	high = read.csv(buildArchiveURL(con, seriesId, con$highField, freq, startDate, endDate))
+	low = read.csv(buildArchiveURL(con, seriesId, con$lowField, freq, startDate, endDate))
+	close = read.csv(buildArchiveURL(con, seriesId, con$closeField, freq, startDate, endDate))
+	volume = read.csv(buildArchiveURL(con, seriesId, con$volField, freq, startDate, endDate))
 	if(nrow(high)==nrow(open) && nrow(low) == nrow(open) && nrow(close) == nrow(open) && nrow(open)>0 ){
 	  # convert everything to XTS. 
 	  if(nrow(volume)==0)
