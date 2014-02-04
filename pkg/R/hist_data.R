@@ -3,12 +3,19 @@ buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
   return(url)
 }
 
-aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){  
+aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = false){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
 		stop("AQConfig list not configured properly.")
 	}
-	 
+
+  cacheKey = paste(seriesId, "_", freq, "_", startDate,"_", endDate, ".cache")
+  if(useCache && file.exists(cacheKey)){
+    # let's return the file from cache. 
+    load(cacheKey)
+    return xtsOhlcv
+  }
+  
 	# load the individual columns.table 
 	open = read.csv(buildArchiveURL(con, seriesId, con$openField, freq, startDate, endDate))
 	high = read.csv(buildArchiveURL(con, seriesId, con$highField, freq, startDate, endDate))
@@ -26,10 +33,14 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit()){
 		  xtsOhlcv= xts(ohlcv, order.by=as.POSIXct(open[,1]/1000000000, origin="1970/01/01"))
 		  colnames(xtsOhlcv) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME")
 
+      if(useCache){
+        save(xtsOhlcv, file=cacheKey)
+      }
 		  # 
 		  return(xtsOhlcv)
 	  }			
 	}
+  
 	# still here. 
 	return(xts())
 }
@@ -89,4 +100,5 @@ aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), si
 	}
 	return(rawToChar(response))
 }
+
 
