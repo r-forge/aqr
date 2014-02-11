@@ -9,6 +9,8 @@
  * It's getting dark. Listening to Kirlian Camera, Not Of This World, Edges.
  * Making the package ready while listening to XP8, Forgive(N), Das Licht (Imperative Reaction Remix).
  * Tuesday evening. Fixing a stdout.
+ * 
+ * Sitting on a monday morning in a train, listening to some pop songs, Lorde. 
  *
  * Code by The Ghost Rider, November 2012.
  *
@@ -18,18 +20,20 @@
 #include <errno.h>
 
 #if defined(WIN32)
+
   #include <winsock.h>
   #include <io.h>
+
 #else
   #ifdef HAVE_UNISTD_H
     #include <unistd.h>
   #endif
   
-    #include <netdb.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <arpa/inet.h>
-  
+  #include <netdb.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <arpa/inet.h>
+
 #endif
 
 #include <pthread.h>

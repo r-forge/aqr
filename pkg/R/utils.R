@@ -1,5 +1,4 @@
 # Utility functions from AQ-R
-
 aqHourIndex <- function(xtsSeries){
   ret <- cbind(xtsSeries, as.POSIXlt(index(xtsSeries))$hour);
   colnames(ret) = c("A", "hour");
@@ -41,9 +40,12 @@ aqDayOfWeekStat <- function(x, f = mean){
     return(dailyMatrix)
 }
 
-
-
-
+#' Removes outliers based on standard deviation filters. Overwrites these with the open value. 
+#' 
+#' @param ohlcv an input Open/High/Low/Close/Volume dataset
+#' @param sdFilterAmount the amount of standard deviations a value has to be off, to be considered errenuous data 
+#' 
+#' @return retuns a filtered ohlcv object
 aqFilterOHLCSD <- function(ohlcv, sdFilterAmount = 10){
   sdLowToOpen = apply(ohlcv[,1] - ohlcv[,2], 2, sd) * sdFilterAmount
   sdHighToOpen = apply(ohlcv[,1] - ohlcv[,3], 2, sd) * sdFilterAmount 
@@ -52,7 +54,11 @@ aqFilterOHLCSD <- function(ohlcv, sdFilterAmount = 10){
   return(ohlcv)
 }
 
-
+#' 
+#' @param hour the hour to remove from this data set, e.g. 8 or 15, etc.
+#' @param x an input  xts object
+#' 
+#' @return a dataset in which all information for this hour has been dropped. 
 aqDropHour <- function(x, hour){
   hourIndex = as.POSIXlt(index(x))$hour
   return(x[hourIndex != hour])
@@ -70,13 +76,15 @@ aqDropHours <- function(x, hours){
 
 #' method to generate a pnl curve from a running position. 
 #' bids, asks and running position must have the same length. 
-#' Can compute the pnl from one price to the other, but only for one asset! Does not take time into account. 
+#' Can compute the pnl from one price to the other, but only for one asset! 
+#' Does not take time into account - if you need signal delays, lag 
+#' all input data on your own.  
 #' 
 #' @param bidPrices an array of bid prices
 #' @param askPrices an array of ask prices
 #' @param runningPosition an array that contains a vector of the position
 #' 
-#' @return This function returns a plain double array with pnl changes and not an XTS series.
+#' @return This function returns a plain double array with pnl changes (uncumulated) and not an XTS series.
 #' 
 #' @note all input arrays must have the same length. 
 generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FALSE)

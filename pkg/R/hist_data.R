@@ -13,7 +13,7 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
   if(useCache && file.exists(cacheKey)){
     # let's return the file from cache. 
     load(cacheKey)
-    return xtsOhlcv
+    return(xtsOhlcv)
   }
   
 	# load the individual columns.table 

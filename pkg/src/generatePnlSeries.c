@@ -2,19 +2,26 @@
 #include <math.h>
 
 #define DEBUG_PRINTF 0
-void convolve(double *a, int *na, double *b, int *nb, double *ab)
-     {
-       int i, j, nab = *na + *nb - 1;
-     
-       for(i = 0; i < nab; i++)
-         ab[i] = 0.0;
-       for(i = 0; i < *na; i++)
-         for(j = 0; j < *nb; j++)
-           ab[i + j] += a[i] * b[j];
-     }
 
-	 
-	 
+// plain function to run a convolution. 
+void convolve(double *a, int *na, double *b, int *nb, double *ab)
+{
+   int i, j, nab = *na + *nb - 1;
+  
+   for(i = 0; i < nab; i++)
+     ab[i] = 0.0;
+   for(i = 0; i < *na; i++)
+     for(j = 0; j < *nb; j++)
+       ab[i + j] += a[i] * b[j];
+}
+
+	
+// 
+// all pnl changes are executed at same time as position curves and in and ask prices. 
+// if you calculate some indicators based on close prices and you want to execute on these close 
+// prices, make sure you pump in close prices plus some spread as bid and ask prices. 
+// time is not taken into account in this method. 
+// 
 void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunningPosition, int* inNRows, double* outPnlSeries)
 {
 	double currentPosition = 0.0;
