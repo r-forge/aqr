@@ -3,7 +3,7 @@ buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
   return(url)
 }
 
-aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = false){  
+aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
 		stop("AQConfig list not configured properly.")
