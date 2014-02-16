@@ -7,6 +7,26 @@ buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
   return(url)
 }
 
+aqSaveXtsToCsv <- function(filename, historyXts){
+	write.csv2(as.data.frame(historyXts), file=filename)
+}
+
+aqLoadXtsFromCsv <- function(filename){
+	read.csv2(file=filename)
+}
+
+aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
+  if(is.null(instrument))
+    stop("No instrument given to load. ")
+    url <- paste("http://ichart.finance.yahoo.com/table.csv?s=", instrument, "&a=",start$mon,"&b=",start$mday,"&c=",(1900+start$year),"&d=",end$mon,"&e=",end$mday,"&f=",(1900+end$year),"&g=d&ignore=.csv", sep="")
+    cat("Loading data from ", url, "\n")
+    rawData <-read.csv(url)
+    dataTable <- cbind(rawData[,2],rawData[,3],rawData[,4], rawData[,5],rawData[,6], rawData[,7])
+    ret <- xts(x=dataTable, order.by=strptime(rawData[,1], format="%Y-%m-%d"))
+    colnames(ret) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME", "ADJUSTED_CLOSE")
+    return(ret)  
+}
+
 aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd()){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
