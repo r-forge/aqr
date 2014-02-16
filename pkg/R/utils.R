@@ -124,3 +124,21 @@ approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosit
 }
 
 
+#' returns today as date8. 
+#' @return a POSIXlt object of now. 
+today <- function(){
+  z <- as.POSIXlt(Sys.time())
+  return(z)
+}
+
+
+
+#' returns the date one month ago as date8
+#' @return a POSIXlt object pointing at thirty days ago
+oneMonthAgo <- function(){
+  z <- as.POSIXlt(Sys.time())
+  z <- as.POSIXlt(z - (3600 * 24 * 30))
+  return(z)
+}
+
+

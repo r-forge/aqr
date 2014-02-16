@@ -7,14 +7,24 @@ buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
   return(url)
 }
 
+#' Saves an XTS object to csv file. 
+#' @param filename where to save data to 
+#' @param historyXts the input xts object
 aqSaveXtsToCsv <- function(filename, historyXts){
 	write.csv2(as.data.frame(historyXts), file=filename)
 }
 
+#' Loads a XTS object from CSV, to be used with our aqSaveXtsToCsv function. 
+#' Not implemented at the moment (16 Feb 2014)
+#' @return an XTS object
 aqLoadXtsFromCsv <- function(filename){
 	read.csv2(file=filename)
 }
 
+#' Loads EOD data from Yahoo. 
+#' @param instrument a Yahoo Instrument ID
+#' @param start a POSIXlt start date
+#' @param end a POSIXlt end date
 aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
   if(is.null(instrument))
     stop("No instrument given to load. ")
@@ -27,6 +37,15 @@ aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
     return(ret)  
 }
 
+#' Loads OHLC from an AQ Master Server
+#' @param seriesId a series ID 
+#' @param freq frequency in enumeration form, f.e. HOURS_1, MINUTES_1 
+#' @param startDate a Date8 
+#' @param endDate a Date8
+#' @param con a fully initialized connection definition 
+#' @param useCache a boolean that says whether you want use and cache data
+#' @param cacheDir a directory name that will be used for caching if enabled
+#' @return a XTS object
 aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd()){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
@@ -82,12 +101,15 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
 	return(xts())
 }
 
+#' stores a matrix to an AQ Master Server
+#' 
 aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE){
   for(i in colnames(data)){
     aqStoreSeriesField(seriesId, i, freq, data[,i], con, silent);
   }
 }
 
+#' Loads one series field from an AQ Master Server
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
@@ -105,9 +127,9 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 
 }
 
-# this function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)
+#' Stores one series field to an AQ Master Server. 
+#' this function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)
 aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
-	require(RCurl)	
 
 	if(ncol(data)>2){
 	  warning("Only the first data column will be stored.")
