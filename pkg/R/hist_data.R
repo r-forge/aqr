@@ -1,18 +1,34 @@
+#'
+#' Builds an archive URL
+#' 
+#' @return the complete archive URL 
 buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
   url = paste("http://", con$tsHost, ":", con$tsPort,"/csv/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=",field,"&STARTDATE=", startDate, "&ENDDATE=",endDate, sep="")
   return(url)
 }
 
-aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE){  
+aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd()){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
 		stop("AQConfig list not configured properly.")
 	}
 
-  cacheKey = paste(seriesId, "_", freq, "_", startDate,"_", endDate, ".cache")
+  cacheKey = paste(seriesId, "_", freq, "_", startDate,"_", endDate, ".history", sep="") 
+  if(useCache){ 
+	# let's check if the cacheDir exists. 
+  	if (!file.exists(paste(cacheDir, "/", sep = "/", collapse = "/"))) {
+	    message("Cache directory doesn't exist, creating it.")
+	    dir.create(file.path(cacheDir), recursive=TRUE)
+	}
+        message("Using cache key ", cacheKey, " in directory ", cacheDir)
+   	# ok, let's create the final cache key. 
+	cacheKey = paste(cacheDir, "/", cacheKey, sep="")
+  }
   if(useCache && file.exists(cacheKey)){
+    message("Loading history from cache.")
     # let's return the file from cache. 
     load(cacheKey)
+    # we know that the object was called xtsOhlcv
     return(xtsOhlcv)
   }
   
@@ -33,9 +49,10 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
 		  xtsOhlcv= xts(ohlcv, order.by=as.POSIXct(open[,1]/1000000000, origin="1970/01/01"))
 		  colnames(xtsOhlcv) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME")
 
-      if(useCache){
-        save(xtsOhlcv, file=cacheKey)
-      }
+	      if(useCache){
+                message("Storing history to cache.")
+		save(xtsOhlcv, file=cacheKey)
+	      }
 		  # 
 		  return(xtsOhlcv)
 	  }			
