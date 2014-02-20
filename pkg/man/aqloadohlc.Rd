@@ -1,36 +1,32 @@
-
 \name{aqLoadOHLC}
 \alias{aqLoadOHLC}
-\title{Loads a OHLCV data set from AQMS}
-\description{
-      This function loads a Open/High/Low/Close/Volume data set from the AQ Master Server. 
-      If the master server does not contain data for a specified series Id, it will return an empty xts object. 
-
-}
-
-
-
+\title{Loads OHLC from an AQ Master Server}
 \usage{
-        aqLoadOHLC(seriesId, freq, startDate, endDate, con)
+aqLoadOHLC(seriesId, freq, startDate, endDate, con = aqInit(),
+  useCache = FALSE, cacheDir = getwd())
 }
 \arguments{
-\item{seriesId}{the series Id}
-\item{freq}{the granularity, must be one of RAW, MINUTES_1, ... EOD, EOM, EOW. }
-\item{startDate}{start date in YYYYMMDD format}
-\item{endDate}{end date in YYYYMMDD format}
-\item{con}{optional - an AQMS configuration - defaults to a call aqInit() if not specified. }
-}
-\seealso{
-        \code{\link{aqInit}}.
-}
-\examples{
-\dontrun{
-        # creates a default configuration
-        con = aqInit()
-        # load data 
-        EURUSD = aqLoadOHLC("CNX.MDI.EUR/USD", "HOURS_1",  20120601, 20120901, con)
-}
-}
+  \item{seriesId}{a series ID}
 
-\keyword{fetching time series data}
+  \item{freq}{frequency in enumeration form, f.e. HOURS_1,
+  MINUTES_1}
+
+  \item{startDate}{a Date8}
+
+  \item{endDate}{a Date8}
+
+  \item{con}{a fully initialized connection definition}
+
+  \item{useCache}{a boolean that says whether you want use
+  and cache data}
+
+  \item{cacheDir}{a directory name that will be used for
+  caching if enabled}
+}
+\value{
+a XTS object
+}
+\description{
+Loads OHLC from an AQ Master Server
+}
 

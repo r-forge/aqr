@@ -1,11 +1,19 @@
 # Utility functions from AQ-R
+
+#' Returns for an XTS input list the hour index per element. 
+#' @param xtsSeries the input object of type XTS. 
+#' @return a vector of the same length as xtsSeries, containing the hour 
 aqHourIndex <- function(xtsSeries){
   ret <- cbind(xtsSeries, as.POSIXlt(index(xtsSeries))$hour);
   colnames(ret) = c("A", "hour");
   return(ret[,2]);
 }
 
-# applies a function across hour slots. 
+#' applies a function across hour slots. Internally, it iterates over 0:23 and selects all rows which fit into this hour. 
+#'
+#' @param x the input xts object
+#' @param f the function to apply  
+#' @return a matrix that contains hourly data 
 aqHourlyStat <- function(x, f = mean){
     
     hourIndex = as.POSIXlt(index(x))$hour
@@ -24,7 +32,11 @@ aqHourlyStat <- function(x, f = mean){
 
 
 
-# applies a function to all values per weekday. 
+#' applies a function to all values per weekday. 
+#' 
+#' @param x the input xts object
+#' @param f the function to apply  
+#' @return a matrix that contains weekly figures  
 aqDayOfWeekStat <- function(x, f = mean){
     dowIndex = as.POSIXlt(index(x))$wday
     dows = c(0:6)
@@ -54,6 +66,7 @@ aqFilterOHLCSD <- function(ohlcv, sdFilterAmount = 10){
   return(ohlcv)
 }
 
+#' removes all data that belongs to a specific hour from an input data set. 
 #' 
 #' @param hour the hour to remove from this data set, e.g. 8 or 15, etc.
 #' @param x an input  xts object
@@ -64,6 +77,10 @@ aqDropHour <- function(x, hour){
   return(x[hourIndex != hour])
 }
 
+#' Drops data of several hours, delegates on to aqDropHour
+#' @param x the input xts data set
+#' @param hours the vector of hours to drop
+#' @return the resulting data set
 aqDropHours <- function(x, hours){
   ret = x
   for(hour in hours){
@@ -133,7 +150,7 @@ today <- function(){
 
 
 
-#' returns the date one month ago as date8
+#' returns the date one month (30 days) ago as date8
 #' @return a POSIXlt object pointing at thirty days ago
 oneMonthAgo <- function(){
   z <- as.POSIXlt(Sys.time())

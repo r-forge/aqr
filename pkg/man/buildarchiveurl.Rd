@@ -1,22 +1,28 @@
 \name{buildArchiveURL}
 \alias{buildArchiveURL}
-\title{Utility function to generate the archive access url.}
-\description{
-	As access to the AQ Master Server (AQMS) is essentially an HTTP GET call, this method constructs the corresponding URL to fetch data. Under certain circumstances, the user might want to reimplement this function, for example when the AQMS archive access has been deployed into a servlet container. 
-}
-
-
-
-
+\title{Builds an archive URL, based on connection parameters, seriesId, field, frequency and start and end date.}
 \usage{
-	buildArchiveURL(con, seriesId, field, freq, startDate, endDate)
+buildArchiveURL(con = aqInit(), seriesId, field, freq, startDate, endDate)
 }
 \arguments{
-\item{con}{Connection object which contains tsHost and tsPort}
-\item{seriesId}{The series ID that is to be loaded}
-\item{field}{the field that is to be loaded}
-\item{freq}{The frequency}
-\item{startDate}{from when...}
-\item{endDate}{to when ...}
+  \item{con}{connection parameters, will be initialized
+  with aqInit() if void}
+
+  \item{seriesId}{the series name}
+
+  \item{field}{the field to load}
+
+  \item{freq}{a frequency string, such as HOURS_1}
+
+  \item{startDate}{the start date}
+
+  \item{endDate}{the end date}
 }
-\keyword{initialization}
+\value{
+the complete archive URL as character
+}
+\description{
+Builds an archive URL, based on connection parameters,
+seriesId, field, frequency and start and end date.
+}
+

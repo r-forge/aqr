@@ -1,29 +1,32 @@
 \name{aqStoreSeriesField}
 \alias{aqStoreSeriesField}
-\title{Stores a single column time series}
-\description{
-	Stores a single column time series to the master server. 
-}
-
-
-
+\title{Stores one series field to an AQ Master Server, typicall called from aqStoreSeries.
+This function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)}
 \usage{
-	aqStoreSeriesField(seriesId, fieldId,freq, data, con = aqInit(), silent=FALSE) 
+aqStoreSeriesField(seriesId, fieldId, freq, data, con = aqInit(),
+  silent = FALSE)
 }
 \arguments{
-\item{seriesId}{the name of the series}
-\item{fieldId}{the name of the field within the series}
-\item{freq}{the frequency}
-\item{data}{a data object, preferrably a zoo object}
-\item{con}{an optional connectivity object}
-\item{silent}{whether the function should print the server's status message or not}
-}
-\examples{
-\dontrun{
+  \item{seriesId}{a series name}
 
-con = aqInit()
-aqStoreSeriesField("EURUSD", "SMA14","HOURS_1", sma, con=con) 
+  \item{fieldId}{the field ID of this data series}
 
+  \item{freq}{a frequency string, must be one of AQ's
+  suported enum names}
+
+  \item{data}{the data as XTS object}
+
+  \item{con}{a connection object, will be initialized by
+  aqInit by default}
+
+  \item{silent}{whether it should print storage
+  diagnostics.}
 }
+\description{
+Stores one series field to an AQ Master Server, typicall
+called from aqStoreSeries. This function assumes that data
+is either a zoo object, or that is a matrix with two
+columns where the first column contains a time series index
+in NANOSECONDS(!!!)
 }
-\keyword{storing time series data}
+

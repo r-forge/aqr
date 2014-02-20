@@ -1,30 +1,42 @@
-#'
-#' Builds an archive URL
-#' 
-#' @return the complete archive URL 
-buildArchiveURL <- function(con, seriesId, field, freq, startDate, endDate){
+
+#' Builds an archive URL, based on connection parameters, seriesId, field, frequency and start and end date.  
+#' @param con connection parameters, will be initialized with aqInit() if void
+#' @param seriesId the series name
+#' @param field the field to load 
+#' @param freq a frequency string, such as HOURS_1
+#' @param startDate the start date
+#' @param endDate the end date 
+#' @return the complete archive URL as character 
+buildArchiveURL <- function(con=aqInit(), seriesId, field, freq, startDate, endDate){
   url = paste("http://", con$tsHost, ":", con$tsPort,"/csv/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=",field,"&STARTDATE=", startDate, "&ENDDATE=",endDate, sep="")
   return(url)
 }
 
 #' Saves an XTS object to csv file. 
+#' 
 #' @param filename where to save data to 
 #' @param historyXts the input xts object
 aqSaveXtsToCsv <- function(filename, historyXts){
 	write.csv2(as.data.frame(historyXts), file=filename)
 }
 
-#' Loads a XTS object from CSV, to be used with our aqSaveXtsToCsv function. 
-#' Not implemented at the moment (16 Feb 2014)
+#' Loads a XTS object from CSV, to be used with our aqSaveXtsToCsv function. This method 
+#' assumes that the fie's first column contains an interpretable timestmap. 
+#'   
+#' Implementation in progress (16 Feb 2014)
+#' 
+#' @param filename the csv file which to load as XTS. 
 #' @return an XTS object
 aqLoadXtsFromCsv <- function(filename){
 	read.csv2(file=filename)
 }
 
-#' Loads EOD data from Yahoo. 
+#' Loads EOD data from Yahoo and returns an XTS object. 
+#' 
 #' @param instrument a Yahoo Instrument ID
 #' @param start a POSIXlt start date
 #' @param end a POSIXlt end date
+#' @return instrument prices as XTS object
 aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
   if(is.null(instrument))
     stop("No instrument given to load. ")
@@ -101,8 +113,13 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
 	return(xts())
 }
 
-#' stores a matrix to an AQ Master Server
+#' stores a matrix onto an AQ Master Server
 #' 
+#' @param seriesId a series ID to store
+#' @param freq the frequency, must be one of AQ's enums
+#' @param data the data as XTS object
+#' @param con a connection object, will be initialized by aqInit by default
+#' @param silent whether  it should print storage diagnostics. 
 aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE){
   for(i in colnames(data)){
     aqStoreSeriesField(seriesId, i, freq, data[,i], con, silent);
@@ -110,6 +127,11 @@ aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE){
 }
 
 #' Loads one series field from an AQ Master Server
+#' @param seriesId the series name
+#' @param fieldId the field name
+#' @param freq the frequency, must be one of ActiveQuant's enums
+#' @param startDate a start date in date8 format (yyyyMMdd)
+#' @param endDate an end date in date8 format (yyyyMMdd)
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
@@ -127,8 +149,14 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 
 }
 
-#' Stores one series field to an AQ Master Server. 
-#' this function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)
+#' Stores one series field to an AQ Master Server, typicall called from aqStoreSeries. 
+#' This function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)
+#' @param seriesId a series name
+#' @param fieldId the field ID of this data series
+#' @param freq a frequency string, must be one of AQ's suported enum names
+#' @param data the data as XTS object
+#' @param con a connection object, will be initialized by aqInit by default
+#' @param silent whether  it should print storage diagnostics. 
 aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
 
 	if(ncol(data)>2){

@@ -1,0 +1,18 @@
+\name{aqDayOfWeekStat}
+\alias{aqDayOfWeekStat}
+\title{applies a function to all values per weekday.}
+\usage{
+aqDayOfWeekStat(x, f = mean)
+}
+\arguments{
+  \item{x}{the input xts object}
+
+  \item{f}{the function to apply}
+}
+\value{
+a matrix that contains weekly figures
+}
+\description{
+applies a function to all values per weekday.
+}
+

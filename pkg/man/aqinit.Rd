@@ -1,22 +1,21 @@
 \name{aqInit}
 \alias{aqInit}
-\title{Creates an AQ Master Server configuration}
-\description{
-	Creates an AQ Master Server (AQMS) configuration list. This configuration list object can be passed on to all aqr functions that connect to the AQMS.
-}
+\title{This method builds an object that carries necessary configuration values.
+The resulting object is a list, which you can modify outside of this function.
+Currently contains tsHost, tsPort, openField,closeField, highField, lowField
+and volField.}
 \usage{
-	aqInit()
+aqInit()
 }
-\examples{
-\dontrun{
-	# creates a default configuration
-	con = aqInit()
-	
-	# set the the tshost to a specific AQMS
-	con$tsHost = "127.0.0.1"
-	con$tsHost = 21231
+\value{
+This function returns a plain list with configuration
+settings.
+}
+\description{
+This method builds an object that carries necessary
+configuration values. The resulting object is a list, which
+you can modify outside of this function. Currently contains
+tsHost, tsPort, openField,closeField, highField, lowField
+and volField.
+}
 
-	
-}
-}
-\keyword{initialization}

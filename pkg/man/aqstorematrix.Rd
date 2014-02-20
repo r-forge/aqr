@@ -1,26 +1,23 @@
 \name{aqStoreMatrix}
 \alias{aqStoreMatrix}
-\title{Stores an xts matrix}
-\description{
-	Stores an xts matrix into AQMS. 
-}
-
+\title{stores a matrix onto an AQ Master Server}
 \usage{
-	aqStoreMatrix(seriesId, freq, data, con = aqInit(), silent=FALSE) 
+aqStoreMatrix(seriesId, freq, data, con = aqInit(), silent = FALSE)
 }
 \arguments{
-\item{seriesId}{the name of the series}
-\item{freq}{the frequency}
-\item{data}{a data object, preferrably a zoo object}
-\item{con}{an optional connectivity object}
-\item{silent}{whether the function should print the server's status message or not}
-}
-\examples{
-\dontrun{
+  \item{seriesId}{a series ID to store}
 
-con = aqInit()
-aqStoreMatrix("EURUSD", "HOURS_1", hourlyData, con = con) 
+  \item{freq}{the frequency, must be one of AQ's enums}
 
+  \item{data}{the data as XTS object}
+
+  \item{con}{a connection object, will be initialized by
+  aqInit by default}
+
+  \item{silent}{whether it should print storage
+  diagnostics.}
 }
+\description{
+stores a matrix onto an AQ Master Server
 }
-\keyword{storing time series data}
+

@@ -1,13 +1,17 @@
 \name{aqHourIndex}
 \alias{aqHourIndex}
-\title{Returns the hour index}
-\description{	
-  Fetches the hour index of data in an xts dataset. Convenience helper. 
-}
+\title{Returns for an XTS input list the hour index per element.}
 \usage{
-	aqHourIndex(xtsSeries)
+aqHourIndex(xtsSeries)
 }
 \arguments{
-\item{xtsSeries}{input xts data set}
+  \item{xtsSeries}{the input object of type XTS.}
 }
-\keyword{utilities}
+\value{
+a vector of the same length as xtsSeries, containing the
+hour
+}
+\description{
+Returns for an XTS input list the hour index per element.
+}
+

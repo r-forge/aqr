@@ -1,3 +1,0 @@
-useDynLib(aqr)
-exportPattern("^[[:alpha:]]+")
-
