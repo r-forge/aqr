@@ -23,17 +23,17 @@ aqUnsubscribeChannel <- function(channel){
 }
 
 aqPoll <- function(){
-  return(.Call("aqPollAll"), PACKAGE="aqr")
+  return(.Call("aqPollAll", PACKAGE="aqr"))
 }
 
 # waits for data and returns a list of channels for which data is available. 
 # this is a synchronous call and thus blocks. 
 aqDataReady <- function(){
-  return(.Call("aqDataReady"), PACKAGE="aqr")
+  return(.Call("aqDataReady", PACKAGE="aqr"))
 }
 
 aqWaitForData <- function(){
-  return(.Call("aqWaitForData"), PACKAGE="aqr")
+  return(.Call("aqWaitForData", PACKAGE="aqr"))
 }
 
 aqSend <- function(channel, message){
