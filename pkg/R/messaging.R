@@ -3,15 +3,15 @@
 ############
 
 aqInitMessaging <- function(host = "localhost", port = 61618){
-  .Call("aqInit", host, port)
+  .Call("aqInit", host, port, PACKAGE="aqr")
 }
 
 aqEnableDebugMessages <- function(){
-  .Call("aqEnableDebugMessages")
+  .Call("aqEnableDebugMessages", PACKAGE="aqr")
 }
 
 aqDisableDebugMessages <- function(){
-  .Call("aqDisableDebugMessages")
+  .Call("aqDisableDebugMessages", PACKAGE="aqr")
 }
 
 aqSubscribeChannel <- function(channel){
@@ -19,27 +19,27 @@ aqSubscribeChannel <- function(channel){
 }
 
 aqUnsubscribeChannel <- function(channel){
-  .Call("aqUnsubscribe", paste("/topic/", channel, sep=""))
+  .Call("aqUnsubscribe", paste("/topic/", channel, sep=""), PACKAGE="aqr")
 }
 
 aqPoll <- function(){
-  return(.Call("aqPollAll"))
+  return(.Call("aqPollAll"), PACKAGE="aqr")
 }
 
 # waits for data and returns a list of channels for which data is available. 
 # this is a synchronous call and thus blocks. 
 aqDataReady <- function(){
-  return(.Call("aqDataReady"))
+  return(.Call("aqDataReady"), PACKAGE="aqr")
 }
 
 aqWaitForData <- function(){
-  return(.Call("aqWaitForData"))
+  return(.Call("aqWaitForData"), PACKAGE="aqr")
 }
 
 aqSend <- function(channel, message){
-  .Call("aqSend", paste("/topic/", channel, sep=""), message)
+  .Call("aqSend", paste("/topic/", channel, sep=""), message, PACKAGE="aqr")
 }
 
 aqTestCallToDynLib<- function(testMessage){
-  return(.Call("testCall", testMessage))
+  return(.Call("testCall", testMessage, PACKAGE="aqr"))
 }

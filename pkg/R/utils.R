@@ -100,6 +100,7 @@ aqDropHours <- function(x, hours){
 #' @param bidPrices an array of bid prices
 #' @param askPrices an array of ask prices
 #' @param runningPosition an array that contains a vector of the position
+#' @param messages specifies whether you want to have debug messages or not, defaults to FALSE
 #' 
 #' @return This function returns a plain double array with pnl changes (uncumulated) and not an XTS series.
 #' 
@@ -110,7 +111,7 @@ generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FAL
         if(messages)message("Generating PNL curve.")
         if(length(bidPrices) == length(askPrices) && length(askPrices) == length(runningPosition))
         {       
-                .C("c_generatePnlCurve", as.double(bidPrices), as.double(askPrices), as.double(runningPosition), as.integer(length(bidPrices)), pnl = double(length(bidPrices)))$pnl
+                .Call("c_generatePnlCurve", as.double(bidPrices), as.double(askPrices), as.double(runningPosition), as.integer(length(bidPrices)), pnl = double(length(bidPrices)), PACKAGE="aqr")$pnl
         }
         else
         {
@@ -129,8 +130,8 @@ approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosit
 	
         if(length(high) == length(runningPosition))
         {       
-                x = .C("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
-		    pnl = double(length(high)), position = double(length(high)))		
+                x = .Call("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
+		    pnl = double(length(high)), position = double(length(high)), PACKAGE="aqr")		
 		return(cbind(x$pnl, x$position))
         }
         else

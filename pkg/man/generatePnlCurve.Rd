@@ -15,6 +15,9 @@ generatePnlCurve(bidPrices, askPrices, runningPosition, messages = FALSE)
 
   \item{runningPosition}{an array that contains a vector of
   the position}
+
+  \item{messages}{specifies whether you want to have debug
+  messages or not, defaults to FALSE}
 }
 \value{
 This function returns a plain double array with pnl changes

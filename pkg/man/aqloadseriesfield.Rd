@@ -15,6 +15,11 @@ aqLoadSeriesField(seriesId, fieldId, freq, startDate, endDate, con = aqInit())
   \item{startDate}{a start date in date8 format (yyyyMMdd)}
 
   \item{endDate}{an end date in date8 format (yyyyMMdd)}
+
+  \item{con}{a connection object}
+}
+\value{
+the loaded series as XTS object
 }
 \description{
 Loads one series field from an AQ Master Server

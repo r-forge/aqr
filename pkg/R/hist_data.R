@@ -132,6 +132,8 @@ aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE){
 #' @param freq the frequency, must be one of ActiveQuant's enums
 #' @param startDate a start date in date8 format (yyyyMMdd)
 #' @param endDate an end date in date8 format (yyyyMMdd)
+#' @param con a connection object
+#' @return the loaded series as XTS object
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
