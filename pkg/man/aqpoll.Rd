@@ -15,14 +15,12 @@
 
 \examples{
 \dontrun{
-
 > aqPoll()
-     [,1]         
+     [,1]
 [1,] "/topic/TEXT"
-     [,2]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+     [,2]
 [1,] "TEST1\nTEST2\nTEST3\n"
 > 
- 
 }
 }
 
