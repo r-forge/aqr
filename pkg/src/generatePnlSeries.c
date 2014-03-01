@@ -26,7 +26,6 @@ void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunn
 {
 	double currentPosition = 0.0;
 	double formerPosition = 0.0;
-	double currentPnl = 0.0;
 	
 	for(int i=1;i<*inNRows;i++)
 	{
@@ -264,8 +263,6 @@ void c_excessiveSpreadStop(double* inBid, double* inAsk, double* inRunningPositi
 {	
 	double currentPosition = 0.0;
 	double currentSpread = 0.0;
-	double currentBid = 0.0;
-	double currentAsk = 0.0;
 	int clearPosFlag = 0; 
 	for(int i=0;i<*inNRows;i++)
 	{
@@ -299,8 +296,6 @@ void c_excessiveSpreadStop(double* inBid, double* inAsk, double* inRunningPositi
 		  outRunningPosition[i] = currentPosition;
 		}		
 		
-		currentBid = inBid[i];
-		currentAsk = inAsk[i];
 	}
 
 
