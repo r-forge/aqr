@@ -111,7 +111,7 @@ generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FAL
         if(messages)message("Generating PNL curve.")
         if(length(bidPrices) == length(askPrices) && length(askPrices) == length(runningPosition))
         {       
-                .Call("c_generatePnlCurve", as.double(bidPrices), as.double(askPrices), as.double(runningPosition), as.integer(length(bidPrices)), pnl = double(length(bidPrices)), PACKAGE="aqr")$pnl
+                .C("c_generatePnlCurve", as.double(bidPrices), as.double(askPrices), as.double(runningPosition), as.integer(length(bidPrices)), pnl = double(length(bidPrices)), PACKAGE="aqr")$pnl
         }
         else
         {
@@ -120,6 +120,9 @@ generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FAL
         }
 }
 
+#' Applies an approximated StopLoss/TakeProfit strategy on an incoming pnl series. 
+#' 
+#' @return the rewritten pnl series. 
 approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosition, messages=FALSE)
 {
         # checks if the length of bid, ask and running position are equally long.
@@ -130,7 +133,7 @@ approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosit
 	
         if(length(high) == length(runningPosition))
         {       
-                x = .Call("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
+                x = .C("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
 		    pnl = double(length(high)), position = double(length(high)), PACKAGE="aqr")		
 		return(cbind(x$pnl, x$position))
         }

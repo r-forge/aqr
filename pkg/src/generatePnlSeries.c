@@ -26,7 +26,8 @@ void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunn
 {
 	double currentPosition = 0.0;
 	double formerPosition = 0.0;
-	
+	double currentPnl = 0.0;
+	// iterate over all incoming rows. 	
 	for(int i=1;i<*inNRows;i++)
 	{
 		currentPosition = inRunningPosition[i];
@@ -34,7 +35,6 @@ void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunn
 		double ask = inAskPrices[i];
 		double formerBid = inBidPrices[i-1];
 		double bid = inBidPrices[i];
-		//printf("Former position / Current position : %f / %f\n", formerPosition, currentPosition);
 		if(currentPosition > 0 && formerPosition>0)
 		{
 				outPnlSeries[i] = bid - formerBid;
