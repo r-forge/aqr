@@ -127,15 +127,15 @@ approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosit
 {
         # checks if the length of bid, ask and running position are equally long.
         if(messages){
-	  message("Generating PNL curve.")
-	  message(high, "/", low, "/", close, "/", takeProfit, "/" , stopLoss, "/", runningPosition)
-	}
-	
+      	  message("Generating PNL curve.")
+      	  message(high, "/", low, "/", close, "/", takeProfit, "/" , stopLoss, "/", runningPosition)
+      	}
+      	
         if(length(high) == length(runningPosition))
         {       
-                x = .C("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
-		    pnl = double(length(high)), position = double(length(high)), PACKAGE="aqr")		
-		return(cbind(x$pnl, x$position))
+            x = .C("c_approximateStopLossTakeProfit", as.double(high), as.double(low), as.double(close), as.double(runningPosition),as.integer(length(runningPosition)),  stopLoss, takeProfit, 
+		            pnl = double(length(high)), position = double(length(high)), PACKAGE="aqr")		
+		        return(cbind(x$pnl, x$position))
         }
         else
         {
