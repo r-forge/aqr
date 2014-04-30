@@ -7,11 +7,8 @@
 #' @param startDate the start date
 #' @param endDate the end date 
 #' @return the complete archive URL as character 
-buildArchiveURL <- function(con=aqInit(), seriesId, field, freq, startDate, endDate, adders=NULL){
+buildArchiveURL <- function(con=aqInit(), seriesId, field, freq, startDate, endDate){
   url = paste("http://", con$tsHost, ":", con$tsPort,"/csv/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=",field,"&STARTDATE=", startDate, "&ENDDATE=",endDate, sep="")
-  if(!is.null(adders)){
-    url=paste(url, adders, sep="")
-  }
   return(url)
 }
 
@@ -52,52 +49,6 @@ aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
     return(ret)  
 }
 
-aqLoadSeries <- function(seriesId, field, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd(), useGZIP=TRUE) {
-  cacheKey = paste(seriesId, "_", field,  "_", freq, "_", startDate,"_", endDate, ".history", sep="") 
-  if(useCache){ 
-    # let's check if the cacheDir exists. 
-    if (!file.exists(paste(cacheDir, "/", sep = "/", collapse = "/"))) {
-      message("Cache directory doesn't exist, creating it.")
-      dir.create(file.path(cacheDir), recursive=TRUE)
-    }
-    message("Using cache key ", cacheKey, " in directory ", cacheDir)
-    # ok, let's create the final cache key. 
-    cacheKey = paste(cacheDir, "/", cacheKey, sep="")
-  }
-  if(useCache && file.exists(cacheKey)){
-    message("Loading history from cache.")
-    # let's return the file from cache. 
-    load(cacheKey)
-    # we know that the object was called xtsOhlcv
-    return(xtsData)
-  }
-  data <- NULL
-  if(useGZIP) {
-    con <- gzcon(buildArchiveURL(con, seriesId, field, freq, startDate, endDate, adders="&GZIP=1"))
-    txt <- readLines(con)
-    data <- read.csv(textConnection(txt))
-  }
-  else{
-    data <- read.csv(buildArchiveURL(con, seriesId, field, freq, startDate, endDate))
-  }
-  if(!is.null(data)){
-    if(nrow(data[,3])>0){
-      xtsData <- xts(data[,3], order.by=as.POSIXct(data[,1]/1000000000, origin="1970/01/01"))
-      colnames(xtsData) <- c(field)
-      
-      if(useCache){
-        message("Storing field history to cache.")
-        save(xtsData, file=cacheKey)
-      }
-      # 
-      return(xtsData)
-    }			
-  }
-  return(xts())
-  
-  
-}
-
 #' Loads OHLC from an AQ Master Server
 #' @param seriesId a series ID 
 #' @param freq frequency in enumeration form, f.e. HOURS_1, MINUTES_1 
@@ -107,21 +58,52 @@ aqLoadSeries <- function(seriesId, field, freq, startDate, endDate, con = aqInit
 #' @param useCache a boolean that says whether you want use and cache data
 #' @param cacheDir a directory name that will be used for caching if enabled
 #' @return a XTS object
-aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd(), useGZIP=TRUE){  
+aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd()){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
 		stop("AQConfig list not configured properly.")
 	}
 
-	# load the individual columns.table  
-	open <- read.csv(buildArchiveURL(con, seriesId, con$openField, freq, startDate, endDate))
-	high <- read.csv(buildArchiveURL(con, seriesId, con$highField, freq, startDate, endDate))
-	low <- read.csv(buildArchiveURL(con, seriesId, con$lowField, freq, startDate, endDate))
-	close <- read.csv(buildArchiveURL(con, seriesId, con$closeField, freq, startDate, endDate))
-	volume <- read.csv(buildArchiveURL(con, seriesId, con$volField, freq, startDate, endDate))
+  cacheKey = paste(seriesId, "_", freq, "_", startDate,"_", endDate, ".history", sep="") 
+  if(useCache){ 
+	# let's check if the cacheDir exists. 
+  	if (!file.exists(paste(cacheDir, "/", sep = "/", collapse = "/"))) {
+	    message("Cache directory doesn't exist, creating it.")
+	    dir.create(file.path(cacheDir), recursive=TRUE)
+	}
+        message("Using cache key ", cacheKey, " in directory ", cacheDir)
+   	# ok, let's create the final cache key. 
+	cacheKey = paste(cacheDir, "/", cacheKey, sep="")
+  }
+  if(useCache && file.exists(cacheKey)){
+    message("Loading history from cache.")
+    # let's return the file from cache. 
+    load(cacheKey)
+    # we know that the object was called xtsOhlcv
+    return(xtsOhlcv)
+  }
   
-  olhcv <- merge(open,high,low,close,volume)
-	return(ohlcv)
+	# load the individual columns.table 
+	open = read.csv(buildArchiveURL(con, seriesId, con$openField, freq, startDate, endDate))
+	high = read.csv(buildArchiveURL(con, seriesId, con$highField, freq, startDate, endDate))
+	low = read.csv(buildArchiveURL(con, seriesId, con$lowField, freq, startDate, endDate))
+	close = read.csv(buildArchiveURL(con, seriesId, con$closeField, freq, startDate, endDate))
+	volume = read.csv(buildArchiveURL(con, seriesId, con$volField, freq, startDate, endDate))
+
+	openXts = xts(open[,3], order.by=as.POSIXct(open[,1]/1000000000, origin="1970/01/01"))
+	highXts = xts(high[,3], order.by=as.POSIXct(high[,1]/1000000000, origin="1970/01/01"))
+	lowXts = xts(low[,3], order.by=as.POSIXct(low[,1]/1000000000, origin="1970/01/01"))
+	closeXts = xts(close[,3], order.by=as.POSIXct(close[,1]/1000000000, origin="1970/01/01"))
+	volXts = xts(volume[,3], order.by=as.POSIXct(volume[,1]/1000000000, origin="1970/01/01"))
+
+	xtsOhlcv = merge(openXts, highXts, lowXts, closeXts, volXts)
+        colnames(xtsOhlcv) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME")
+
+  if(useCache){
+		message("Storing history to cache.")
+		save(xtsOhlcv, file=cacheKey)
+  }
+ 	return(xtsOhlcv)
 }
 
 #' stores a matrix onto an AQ Master Server
@@ -131,9 +113,10 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
 #' @param data the data as XTS object
 #' @param con a connection object, will be initialized by aqInit by default
 #' @param silent whether  it should print storage diagnostics. 
-aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE){
+#' @param writeKey the write key, unset by default
+aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE, writeKey="unset"){
   for(i in colnames(data)){
-    aqStoreSeriesField(seriesId, i, freq, data[,i], con, silent);
+    aqStoreSeriesField(seriesId, i, freq, data[,i], con, silent, writeKey);
   }
 }
 
@@ -170,7 +153,8 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 #' @param data the data as XTS object
 #' @param con a connection object, will be initialized by aqInit by default
 #' @param silent whether  it should print storage diagnostics. 
-aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE){
+#' @param writeKey the write key, unset by default
+aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE, writeKey="unset"){
 
 	if(ncol(data)>2){
 	  warning("Only the first data column will be stored.")
