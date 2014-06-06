@@ -95,6 +95,13 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
 	lowXts = xts(low[,3], order.by=as.POSIXct(low[,1]/1000000000, origin="1970/01/01"))
 	closeXts = xts(close[,3], order.by=as.POSIXct(close[,1]/1000000000, origin="1970/01/01"))
 	volXts = xts(volume[,3], order.by=as.POSIXct(volume[,1]/1000000000, origin="1970/01/01"))
+	# sanity checks. 
+	if(nrow(openXts)==0)openXts <- 0
+	if(nrow(highXts)==0)highXts <- 0
+	if(nrow(lowXts)==0)lowXts <- 0
+	if(nrow(closeXts)==0)closeXts <- 0
+	if(nrow(volXts)==0)volXts <- 0
+
 
 	xtsOhlcv = merge(openXts, highXts, lowXts, closeXts, volXts)
         colnames(xtsOhlcv) <- c("OPEN", "HIGH", "LOW", "CLOSE", "VOLUME")
