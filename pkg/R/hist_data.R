@@ -84,11 +84,11 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
   }
   
 	# load the individual columns.table 
-	open = read.csv(buildArchiveURL(con, seriesId, con$openField, freq, startDate, endDate),colClasses=c("numeric", "NA", "numeric"))
-	high = read.csv(buildArchiveURL(con, seriesId, con$highField, freq, startDate, endDate),colClasses=c("numeric", "NA", "numeric"))
-	low = read.csv(buildArchiveURL(con, seriesId, con$lowField, freq, startDate, endDate),colClasses=c("numeric", "NA", "numeric"))
-	close = read.csv(buildArchiveURL(con, seriesId, con$closeField, freq, startDate, endDate),colClasses=c("numeric", "NA", "numeric"))
-	volume = read.csv(buildArchiveURL(con, seriesId, con$volField, freq, startDate, endDate),colClasses=c("numeric", "NA", "numeric"))
+	open = read.csv(buildArchiveURL(con, seriesId, con$openField, freq, startDate, endDate),colClasses=c("numeric", "character", "numeric"))
+	high = read.csv(buildArchiveURL(con, seriesId, con$highField, freq, startDate, endDate),colClasses=c("numeric", "character", "numeric"))
+	low = read.csv(buildArchiveURL(con, seriesId, con$lowField, freq, startDate, endDate),colClasses=c("numeric", "character", "numeric"))
+	close = read.csv(buildArchiveURL(con, seriesId, con$closeField, freq, startDate, endDate),colClasses=c("numeric", "character", "numeric"))
+	volume = read.csv(buildArchiveURL(con, seriesId, con$volField, freq, startDate, endDate),colClasses=c("numeric", "character", "numeric"))
 
 	openXts = xts(open[,3], order.by=as.POSIXct(open[,1]/1000000000, origin="1970/01/01"))
 	highXts = xts(high[,3], order.by=as.POSIXct(high[,1]/1000000000, origin="1970/01/01"))
