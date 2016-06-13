@@ -92,14 +92,14 @@ aqDropHours <- function(x, hours){
 
 
 
-#' returns today
+#' returns today as PosixLT object
 #' @return a POSIXlt object of now. 
 today <- function(){
   z <- as.POSIXlt(Sys.time())
   return(z)
 }
 
-#' returns the date one month (30 days by default) 
+#' returns the date X days ago (30 days by default) 
 #' @return a POSIXlt object 
 #' @param d amount of days to shift, default: 30
 daysAgo <- function(d=30){
@@ -114,4 +114,39 @@ daysAgo <- function(d=30){
 d8 <- function(dateObj) {
 	as.integer(strftime(dateObj, format="%Y%d%m"))
 }
+
+
+
+#' Normalizes an input matrix along certain dimensions to a range from 0 to 1. Retains the matrix class, such as XTS, ZOO, etc. 
+#' @param inputMatrix an input matrix with numbers, NAs not allowed. 
+#' @param normRange specifies by which range to normalize, 0 = entire matrix, 1 = per row, 2 = per column
+#' @return a normalized copy of the input matrix
+normalize <- function(inputMatrix, normRange = 1) {
+	# first, check for NAs. 
+	if(sum(is.na(inputMatrix))>0)
+		stop("Input matrix carries NAs, cannot normalize.")	
+	#
+	if(normRange == 0) {
+		outputMatrix <- (inputMatrix - min(inputMatrix)) / (max(inputMatrix) - min(inputMatrix))
+		return(outputMatrix)
+	}
+	else if(normRange == 1) {
+		outputMatrix <- inputMatrix
+		for(i in 1:nrow(inputMatrix)){
+			outputMatrix[i,] <- (inputMatrix[i,] - min(inputMatrix[i,])) / (max(inputMatrix[i,]) - min(inputMatrix[i,]))
+		}		
+		return(outputMatrix)
+	}
+	else if(normRange == 2) {
+		outputMatrix <- inputMatrix
+		for(i in 1:ncol(inputMatrix)){
+			outputMatrix[,i] <- (inputMatrix[,i] - min(inputMatrix[,i])) / (max(inputMatrix[,i]) - min(inputMatrix[,i]))
+		}		
+		return(outputMatrix)
+	}
+	else {
+		stop("Unsupported normRange parameter value. Must be one of {0,1,2}.")
+	}
+}
+
 
