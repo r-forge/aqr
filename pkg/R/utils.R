@@ -150,3 +150,32 @@ normalize <- function(inputMatrix, normRange = 1) {
 }
 
 
+
+
+#' assembles a window 
+#' @param inputMatrix an input matrix
+#' @windowSize an input size
+#' @return a windowed ... 
+assembleWindow <- function(inputMatrix, windowSize = 10) {
+	
+	outputMatrix <- xts()
+	columnNames <- paste(rep(colnames(inputMatrix), windowSize), "_", rep(c(1:windowSize), each=ncol(inputMatrix)), sep="")
+	for(i in windowSize:nrow(inputMatrix)){
+		# newRow will carry all input values. 
+		newRow <- as.double(inputMatrix[i, ])
+		for(j in 1:(windowSize - 1)){
+			newRow <- c(newRow, as.double(inputMatrix[i-j]))
+		}
+		# converting new row to XTS object 
+		newRow <- xts(matrix(newRow,nrow=1), order.by=index(inputMatrix[i,]))
+		colnames(newRow) <- columnNames
+		if(length(outputMatrix)==0)
+			outputMatrix <- newRow
+		else
+			outputMatrix <- rbind(outputMatrix, newRow)
+	}
+	return(outputMatrix)
+}
+
+
+
