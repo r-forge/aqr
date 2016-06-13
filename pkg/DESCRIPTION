@@ -15,4 +15,5 @@ Description: This R extension provides methods to use a standalone ActiveQuant
     support requests, please join the mailing list at
     https://r-forge.r-project.org/mail/?group_id=1518
 License: GPL (>= 2)
-URL: http://www.activequant.com
+URL: http://www.stormdealers.com
+RoxygenNote: 5.0.1
