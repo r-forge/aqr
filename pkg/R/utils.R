@@ -92,14 +92,14 @@ aqDropHours <- function(x, hours){
 
 
 
-#' returns today as PosixLT object
+#' returns today
 #' @return a POSIXlt object of now. 
 today <- function(){
   z <- as.POSIXlt(Sys.time())
   return(z)
 }
 
-#' returns the date X days ago (30 days by default) 
+#' returns the date one month (30 days by default) 
 #' @return a POSIXlt object 
 #' @param d amount of days to shift, default: 30
 daysAgo <- function(d=30){
@@ -115,67 +115,9 @@ d8 <- function(dateObj) {
 	as.integer(strftime(dateObj, format="%Y%d%m"))
 }
 
-
-
-#' Normalizes an input matrix along certain dimensions to a range from 0 to 1. Retains the matrix class, such as XTS, ZOO, etc. 
-#' @param inputMatrix an input matrix with numbers, NAs not allowed. 
-#' @param normRange specifies by which range to normalize, 0 = entire matrix, 1 = per row, 2 = per column
-#' @return a normalized copy of the input matrix
-normalize <- function(inputMatrix, normRange = 1) {
-	# first, check for NAs. 
-	if(sum(is.na(inputMatrix))>0)
-		stop("Input matrix carries NAs, cannot normalize.")	
-	#
-	if(normRange == 0) {
-		outputMatrix <- (inputMatrix - min(inputMatrix)) / (max(inputMatrix) - min(inputMatrix))
-		return(outputMatrix)
-	}
-	else if(normRange == 1) {
-		outputMatrix <- inputMatrix
-		for(i in 1:nrow(inputMatrix)){
-			outputMatrix[i,] <- (inputMatrix[i,] - min(inputMatrix[i,])) / (max(inputMatrix[i,]) - min(inputMatrix[i,]))
-		}		
-		return(outputMatrix)
-	}
-	else if(normRange == 2) {
-		outputMatrix <- inputMatrix
-		for(i in 1:ncol(inputMatrix)){
-			outputMatrix[,i] <- (inputMatrix[,i] - min(inputMatrix[,i])) / (max(inputMatrix[,i]) - min(inputMatrix[,i]))
-		}		
-		return(outputMatrix)
-	}
-	else {
-		stop("Unsupported normRange parameter value. Must be one of {0,1,2}.")
-	}
+#' Backadjusts data, expects yahoo xts structure: 
+#' column 1-4: ohlc, 5: vol, 6: backadjusted close price
+backadjust <- function(yahooOhlc) {
+  
 }
-
-
-
-
-#' assembles a window 
-#' @param inputMatrix an input matrix
-#' @windowSize an input size
-#' @return a windowed ... 
-assembleWindow <- function(inputMatrix, windowSize = 10) {
-	
-	outputMatrix <- xts()
-	columnNames <- paste(rep(colnames(inputMatrix), windowSize), "_", rep(c(1:windowSize), each=ncol(inputMatrix)), sep="")
-	for(i in windowSize:nrow(inputMatrix)){
-		# newRow will carry all input values. 
-		newRow <- as.double(inputMatrix[i, ])
-		for(j in 1:(windowSize - 1)){
-			newRow <- c(newRow, as.double(inputMatrix[i-j]))
-		}
-		# converting new row to XTS object 
-		newRow <- xts(matrix(newRow,nrow=1), order.by=index(inputMatrix[i,]))
-		colnames(newRow) <- columnNames
-		if(length(outputMatrix)==0)
-			outputMatrix <- newRow
-		else
-			outputMatrix <- rbind(outputMatrix, newRow)
-	}
-	return(outputMatrix)
-}
-
-
 

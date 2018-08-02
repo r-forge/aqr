@@ -83,7 +83,7 @@ void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunn
 
 
 
-void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRunningPosition, int* inNRows, double* inStopLoss, double* outRunningPosition)
+void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRunningPosition, int* inNRows, double* inStopLoss, double* inTakeProfit, double* outRunningPosition)
 {
 	double* pnlSeries = malloc(*inNRows * sizeof(double));
 	double currentPosition = 0.0;
@@ -98,7 +98,7 @@ void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRu
 		currentPnl = currentPnl + pnlSeries[i];
 		//printf("current pnl: %f\n", currentPnl);
 		outRunningPosition[i] = currentPosition;
-		if( (*inStopLoss < 0 && currentPnl < *inStopLoss) || (*inStopLoss > 0&& currentPnl > *inStopLoss))
+		if( (*inStopLoss < 0 && currentPnl < *inStopLoss) || (*inTakeProfit > 0&& currentPnl > *inTakeProfit))
 		{
 			//printf("Stop Loss triggered. \n");
 			// overwrite until end of current direction. 
@@ -129,6 +129,8 @@ void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRu
 }
 
 // note, this function does not support position scaling, it can only handly position side changes as long as the position size stays the same. 
+// can't handle increasing positions right now ...
+// trades at close 
 void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inClose, double* inRunningPosition, int* inNRows, double* inStopLoss, double* inTakeProfit, double* outReturn, double* outPosition)
 {
 	double formerPosition = 0.0; 
@@ -151,8 +153,6 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 		 
 		// let's calculate the PNL change for our current position ... 
 		if(stopFlag == 1){
-		  // we have been stopped out, so let's signal this in our out position array and let's also stop processing this current position until our position would have changed. 
-		  outPosition[i] = 0; 
 #if DEBUG_PRINTF > 0
 		  printf("2\n");
 #endif		  
@@ -188,7 +188,7 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 		  if(tempPnl < *inStopLoss){
 		    // liquidate ... 
 		    outPosition[i] = 0.0; 
-		    stopFlag = 1; 
+		    stopFlag = 1; // set the stop flag .. 
 		    double leeway = *inStopLoss - currentPnl; 
 		    pnlChange = leeway; 
 #if DEBUG_PRINTF > 0		    
@@ -202,7 +202,7 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 #if DEBUG_PRINTF > 0		  
 		  printf("5.2. %f\n", tempPnl);
 #endif		  
-
+		  // checking if we weren't stopped yet ... 
 		  if((stopFlag==0) && (tempPnl > *inTakeProfit)){
 		    // liquidate ... 
 		    outPosition[i] = 0.0; 
@@ -215,21 +215,17 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 
 		    
 		  }
-		  // 
-		  
-		  
-		  // 
 		}
-		// we will store the close for our next period's change calculation.
-		refPrice = inClose[i];		  
 		
-		//printf("current position: %f\n", currentPosition);
+		// compute current pnl in current position ... 
 		currentPnl = currentPnl + pnlChange; 
 #if DEBUG_PRINTF > 0		
 		printf("pnlChange: %f\n", pnlChange);
 #endif		  
 
-		if(stopFlag == 0)
+		if(stopFlag == 0) // not stopped out, so let's copy it over 
+		  outPosition[i] = inRunningPosition[i]; 
+		else if(stopFlag == 1 && inRunningPosition[i] != formerPosition) // stopped out, but different position ... 
 		  outPosition[i] = inRunningPosition[i]; 
 		else
 		  outPosition[i] = 0.0; 
@@ -243,10 +239,14 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 #if DEBUG_PRINTF > 0		  
 		  printf("Resetting pnl\n");		  
 #endif		  
-
 		  
 		}
+
+		// carry over of data to next iteration ... 
 		formerPosition = inRunningPosition[i]; 
+		refPrice = inClose[i];		  
+
+
 #if DEBUG_PRINTF > 0		
 		printf("end of period PNL: %f\n----\n", currentPnl);
 #endif		  
