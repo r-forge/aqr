@@ -100,13 +100,15 @@ void debugPrint(const char *fmt, ...)
   Rvprintf(fmt, args);
   va_end(args);
 }
-
+//' @export
+// [[Rcpp::export]]
 SEXP aqEnableDebugMessages(){
   SEXP Rresult = R_NilValue;
   debugMessagesEnabled = 0x01;
   return Rresult;
 }
-
+//' @export
+// [[Rcpp::export]]
 SEXP aqDisableDebugMessages(){
   SEXP Rresult = R_NilValue;
   debugMessagesEnabled = 0x00;
@@ -115,6 +117,8 @@ SEXP aqDisableDebugMessages(){
 
 
 // using stomp 1.0
+//' @export
+// [[Rcpp::export]]
 char* buildConnectMsg(){
   char* msg;
   msg = Calloc(200, char);
@@ -124,7 +128,8 @@ char* buildConnectMsg(){
   return msg;
 }
 
-
+//' @export
+// [[Rcpp::export]]
 char* buildSubscribeMsg(const char* topicName, const char* selector, const char* id){
   char msgPart1[] = "SUBSCRIBE\ndestination: ";
   char msgPart1_1[] = "id: ";
@@ -161,7 +166,8 @@ char* buildSubscribeMsg(const char* topicName, const char* selector, const char*
   strcat(ret, msgPart3);
   return ret;
 }
-
+//' @export
+// [[Rcpp::export]]
 const char* buildUnsubscribeMsg(char* id){
   char msgPart1[] = "UNSUBSCRIBE\n";
   char msgPart2[] = "id: ";
@@ -187,7 +193,8 @@ const char* buildUnsubscribeMsg(char* id){
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 const char* buildSendMsg(char* channel, char* message){
   char msgPart1[] = "SEND\n";
   char msgPart2[] = "destination: ";
@@ -214,11 +221,13 @@ const char* buildSendMsg(char* channel, char* message){
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 void stopConnection(){
   connected = 0x00;
 }
-
+//' @export
+// [[Rcpp::export]]
 void localSend(const char* msg)
 {
 #if defined(WIN32)
@@ -232,7 +241,8 @@ void localSend(const char* msg)
 #endif
 }
 
-
+//' @export
+// [[Rcpp::export]]
 void flush(){
 #if defined(WIN32)
 	send(socketFileDescriptor,// Connected socket
@@ -300,7 +310,8 @@ char* readMessage(){
   debugPrint("Read %d bytes. %s\n",readCounter, buffer);
   return(buffer);
 }
-
+//' @export
+// [[Rcpp::export]]
 char* getMessageBody(char* incomingMessage){
   // get the first line.
   char* lineBuffer;lineBuffer = Calloc(4096, char);
@@ -362,7 +373,8 @@ char* getMessageBody(char* incomingMessage){
   return body;
 }
 
-
+//' @export
+// [[Rcpp::export]]
 char* getDestination(char* incomingMessage){
   debugPrint("Getting destination\n");
   // get the first line.
@@ -410,7 +422,8 @@ char* getDestination(char* incomingMessage){
   return destination;
 }
 
-
+//' @export
+// [[Rcpp::export]]
 char* getMessageCommand(char* incomingMessage){
 
     // get the first line.
@@ -432,7 +445,8 @@ char* getMessageCommand(char* incomingMessage){
       debugPrint("command: >%s<\n", lineBuffer);
       return lineBuffer;
 }
-
+//' @export
+// [[Rcpp::export]]
 void processMessage(char* incomingMessage){
   // first, process the message type
   char* msgType = getMessageCommand(incomingMessage);
@@ -506,6 +520,8 @@ void processMessage(char* incomingMessage){
 /**
  * main receiver loop.
  **/
+//' @export
+// [[Rcpp::export]]
 void* receiverThreadCode(){
  	// child process code.
 	while(connected == 0x01){
@@ -518,7 +534,8 @@ void* receiverThreadCode(){
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 void startConnection(){
   if(connected==0x01)
     error("Already connected. Not reconnecting. \n");
@@ -567,7 +584,8 @@ void startConnection(){
 
 
 
-
+//' @export
+// [[Rcpp::export]]
 void subscribe(const char* channel){
   debugPrint("Subscribing to channel >%s<\n", channel);
   // now that we are here ... let's add this channel.
@@ -595,6 +613,8 @@ void subscribe(const char* channel){
 }
 
 //
+//' @export
+// [[Rcpp::export]]
 void unsubscribe(const char* channel){
   debugPrint("Unsubscribe from channel >%s<\n", channel);
   for(int i=0;i<MAX_CHANNELS;i++){
@@ -615,6 +635,8 @@ void unsubscribe(const char* channel){
 }
 
 // open the socket connection.
+//' @export
+// [[Rcpp::export]]
 void openSocketConnection(){
   struct sockaddr_in serv_addr;
   struct hostent *server;
@@ -662,7 +684,8 @@ void openSocketConnection(){
   //
   debugPrint("AQ-R connected successfully to %s:%d\n", tcpTargetHost, tcpTargetPort);
 }
-
+//' @export
+// [[Rcpp::export]]
 void closeSocketConnection(){
   if(socketFileDescriptor!=0x00){
     close(socketFileDescriptor);
@@ -675,6 +698,8 @@ void closeSocketConnection(){
 
 
 // utility function to initialize the AQ-R part.
+//' @export
+// [[Rcpp::export]]
 void initialize(){
   debugPrint("Initializing AQ-R C part. \n");
   initialized = 1;
@@ -696,6 +721,8 @@ void initialize(){
 }
 
 // utility function to check if we are subscribed already.
+//' @export
+// [[Rcpp::export]]
 int alreadySubscribed(const char* channel){
   for(int i=0;i<MAX_CHANNELS;i++){
     if(subscribedChannels[i]!=0x00){
@@ -710,7 +737,8 @@ int alreadySubscribed(const char* channel){
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 SEXP aqPollAll(){
   SEXP Rresult = R_NilValue;
 
@@ -775,7 +803,8 @@ SEXP aqPollAll(){
   return Rresult;
 }
 
-
+//' @export
+// [[Rcpp::export]]
 SEXP aqPollChannel(SEXP channel){
   SEXP Rresult = R_NilValue;
   // get the mutex on our channel list.
@@ -787,6 +816,8 @@ SEXP aqPollChannel(SEXP channel){
 
 // waits for data and returns a list of channels for which data is available.
 // this is a synchronous call and thus blocks.
+//' @export
+// [[Rcpp::export]]
 SEXP aqWaitForData(){
   SEXP Rresult;
   // get the mutex on our channel list.
@@ -804,6 +835,8 @@ SEXP aqWaitForData(){
 /**
  * s-expression contains channel list with ready data.
  */
+//' @export
+// [[Rcpp::export]]
 SEXP aqDataReady(){
   //
   SEXP Rresult = R_NilValue;
@@ -843,6 +876,8 @@ SEXP aqDataReady(){
 }
 
 //
+//' @export
+// [[Rcpp::export]]
 SEXP aqInit(SEXP stompHost, SEXP stompPort)
 {
   //
@@ -867,6 +902,8 @@ SEXP aqInit(SEXP stompHost, SEXP stompPort)
 
 //aqSubscribe is a synchronous call which will open a connection upon start.
 //arguments in R come in over S-Expressions
+//' @export
+// [[Rcpp::export]]
 SEXP aqSubscribe(SEXP channel){
   SEXP Rresult;
 
@@ -906,7 +943,8 @@ SEXP aqSubscribe(SEXP channel){
   return Rresult;
 }
 
-
+//' @export
+// [[Rcpp::export]]
 SEXP aqSend(SEXP channel, SEXP message){
   //
   SEXP Rresult = R_NilValue;
@@ -980,7 +1018,8 @@ SEXP aqUnsubscribe(SEXP channel){
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 SEXP testCall(SEXP args)
 {
 	return args;

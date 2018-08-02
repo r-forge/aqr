@@ -4,6 +4,8 @@
 #define DEBUG_PRINTF 0
 
 // plain function to run a convolution. 
+//' @export
+// [[Rcpp::export]]
 void convolve(double *a, int *na, double *b, int *nb, double *ab)
 {
    int i, j, nab = *na + *nb - 1;
@@ -22,6 +24,8 @@ void convolve(double *a, int *na, double *b, int *nb, double *ab)
 // prices, make sure you pump in close prices plus some spread as bid and ask prices. 
 // time is not taken into account in this method. 
 // 
+//' @export
+// [[Rcpp::export]]
 void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunningPosition, int* inNRows, double* outPnlSeries)
 {
 	double currentPosition = 0.0;
@@ -82,7 +86,8 @@ void c_generatePnlCurve(double* inBidPrices, double* inAskPrices, double* inRunn
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRunningPosition, int* inNRows, double* inStopLoss, double* inTakeProfit, double* outRunningPosition)
 {
 	double* pnlSeries = malloc(*inNRows * sizeof(double));
@@ -131,6 +136,8 @@ void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRu
 // note, this function does not support position scaling, it can only handly position side changes as long as the position size stays the same. 
 // can't handle increasing positions right now ...
 // trades at close 
+//' @export
+// [[Rcpp::export]]
 void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inClose, double* inRunningPosition, int* inNRows, double* inStopLoss, double* inTakeProfit, double* outReturn, double* outPosition)
 {
 	double formerPosition = 0.0; 
@@ -185,7 +192,7 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 		  printf("5.1. %f\n", tempPnl);
 #endif		  
 
-		  if(tempPnl < *inStopLoss){
+		  if(tempPnl =< *inStopLoss){
 		    // liquidate ... 
 		    outPosition[i] = 0.0; 
 		    stopFlag = 1; // set the stop flag .. 
@@ -203,7 +210,7 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 		  printf("5.2. %f\n", tempPnl);
 #endif		  
 		  // checking if we weren't stopped yet ... 
-		  if((stopFlag==0) && (tempPnl > *inTakeProfit)){
+		  if((stopFlag==0) && (tempPnl >= *inTakeProfit)){
 		    // liquidate ... 
 		    outPosition[i] = 0.0; 
 		    stopFlag = 1;
@@ -258,7 +265,8 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 }
 
 
-
+//' @export
+// [[Rcpp::export]]
 void c_excessiveSpreadStop(double* inBid, double* inAsk, double* inRunningPosition, int* inNRows, double* inExcessiveSpreadVar, double* outRunningPosition)
 {	
 	double currentPosition = 0.0;
