@@ -14,4 +14,3 @@ aqSaveXtsToCsv(filename, historyXts)
 \description{
 Saves an XTS object to csv file.
 }
-

@@ -32,4 +32,3 @@ all input data on your own.
 \note{
 all input arrays must have the same length.
 }
-

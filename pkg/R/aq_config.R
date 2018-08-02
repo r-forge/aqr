@@ -4,6 +4,7 @@
 #' and volField.
 #' 
 #' @return This function returns a plain list with configuration settings.
+#' @export
 aqInit <- function(){
 	# used to set default parameters. 
 	# all these can be overriden. 

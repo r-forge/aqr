@@ -16,6 +16,7 @@
 #' @return This function returns a plain double array with pnl changes (uncumulated) and not an XTS series, aligned to your input bid/ask series
 #' 
 #' @note all input arrays must have the same length. 
+#' @export
 generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FALSE)
 {
         # checks if the length of bid, ask and running position are equally long.
@@ -34,6 +35,7 @@ generatePnlCurve <- function(bidPrices, askPrices, runningPosition, messages=FAL
 #' Applies an approximated StopLoss/TakeProfit strategy on an incoming pnl series. 
 #' 
 #' @return the rewritten pnl series. 
+#' @export
 approximateSLTP <- function(high, low, close, takeProfit, stopLoss, runningPosition, messages=FALSE)
 {
         # checks if the length of bid, ask and running position are equally long.

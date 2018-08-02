@@ -13,4 +13,3 @@ the rewritten pnl series.
 \description{
 Applies an approximated StopLoss/TakeProfit strategy on an incoming pnl series.
 }
-

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{today}
 \alias{today}
-\title{returns today as PosixLT object}
+\title{returns today}
 \usage{
 today()
 }
@@ -10,6 +10,5 @@ today()
 a POSIXlt object of now.
 }
 \description{
-returns today as PosixLT object
+returns today
 }
-

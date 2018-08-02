@@ -15,4 +15,3 @@ an integer YYYYMMDD representation
 \description{
 Formats an input POSIX date to Date8 format (YYYYMMDD). This function is a convenience function.
 }
-

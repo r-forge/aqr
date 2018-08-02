@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{daysAgo}
 \alias{daysAgo}
-\title{returns the date X days ago (30 days by default)}
+\title{returns the date one month (30 days by default)}
 \usage{
 daysAgo(d = 30)
 }
@@ -13,6 +13,5 @@ daysAgo(d = 30)
 a POSIXlt object
 }
 \description{
-returns the date X days ago (30 days by default)
+returns the date one month (30 days by default)
 }
-

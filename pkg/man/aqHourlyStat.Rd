@@ -17,4 +17,3 @@ a matrix that contains hourly data
 \description{
 applies a function across hour slots. Internally, it iterates over 0:23 and selects all rows which fit into this hour.
 }
-

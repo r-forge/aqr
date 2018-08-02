@@ -19,4 +19,3 @@ instrument prices as XTS object
 \description{
 Loads EOD data from Yahoo and returns an XTS object.
 }
-

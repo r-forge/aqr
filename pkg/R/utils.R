@@ -3,6 +3,7 @@
 #' Returns for an XTS input list the hour index per element. 
 #' @param xtsSeries the input object of type XTS. 
 #' @return a vector of the same length as xtsSeries, containing the hour 
+#' @export
 aqHourIndex <- function(xtsSeries){
   ret <- cbind(xtsSeries, as.POSIXlt(index(xtsSeries))$hour);
   colnames(ret) = c("A", "hour");
@@ -14,6 +15,7 @@ aqHourIndex <- function(xtsSeries){
 #' @param x the input xts object
 #' @param f the function to apply  
 #' @return a matrix that contains hourly data 
+#' @export
 aqHourlyStat <- function(x, f = mean){
     
     hourIndex = as.POSIXlt(index(x))$hour
@@ -37,6 +39,7 @@ aqHourlyStat <- function(x, f = mean){
 #' @param x the input xts object
 #' @param f the function to apply  
 #' @return a matrix that contains weekly figures  
+#' @export
 aqDayOfWeekStat <- function(x, f = mean){
     dowIndex = as.POSIXlt(index(x))$wday
     dows = c(0:6)
@@ -58,6 +61,7 @@ aqDayOfWeekStat <- function(x, f = mean){
 #' @param sdFilterAmount the amount of standard deviations a value has to be off, to be considered errenuous data 
 #' 
 #' @return retuns a filtered ohlcv object
+#' @export
 aqFilterOHLCSD <- function(ohlcv, sdFilterAmount = 10){
   sdLowToOpen = apply(ohlcv[,1] - ohlcv[,2], 2, sd) * sdFilterAmount
   sdHighToOpen = apply(ohlcv[,1] - ohlcv[,3], 2, sd) * sdFilterAmount 
@@ -72,6 +76,7 @@ aqFilterOHLCSD <- function(ohlcv, sdFilterAmount = 10){
 #' @param x an input  xts object
 #' 
 #' @return a dataset in which all information for this hour has been dropped. 
+#' @export
 aqDropHour <- function(x, hour){
   hourIndex = as.POSIXlt(index(x))$hour
   return(x[hourIndex != hour])
@@ -81,6 +86,7 @@ aqDropHour <- function(x, hour){
 #' @param x the input xts data set
 #' @param hours the vector of hours to drop
 #' @return the resulting data set
+#' @export
 aqDropHours <- function(x, hours){
   ret = x
   for(hour in hours){
@@ -94,6 +100,7 @@ aqDropHours <- function(x, hours){
 
 #' returns today
 #' @return a POSIXlt object of now. 
+#' @export
 today <- function(){
   z <- as.POSIXlt(Sys.time())
   return(z)
@@ -102,6 +109,7 @@ today <- function(){
 #' returns the date one month (30 days by default) 
 #' @return a POSIXlt object 
 #' @param d amount of days to shift, default: 30
+#' @export
 daysAgo <- function(d=30){
   z <- as.POSIXlt(Sys.time())
   z <- as.POSIXlt(z - (3600 * 24 * d))
@@ -111,12 +119,14 @@ daysAgo <- function(d=30){
 #' Formats an input POSIX date to Date8 format (YYYYMMDD). This function is a convenience function. 
 #' @param dateObj a POSIX date object
 #' @return an integer YYYYMMDD representation 
+#' @export
 d8 <- function(dateObj) {
 	as.integer(strftime(dateObj, format="%Y%d%m"))
 }
 
 #' Backadjusts data, expects yahoo xts structure: 
 #' column 1-4: ohlc, 5: vol, 6: backadjusted close price
+#' @export
 backadjust <- function(yahooOhlc) {
   
 }

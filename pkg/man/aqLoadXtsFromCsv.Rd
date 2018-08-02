@@ -21,4 +21,3 @@ assumes that the fie's first column contains an interpretable timestmap.
   
 Implementation in progress (16 Feb 2014)
 }
-

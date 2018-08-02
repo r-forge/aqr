@@ -17,4 +17,3 @@ a matrix that contains weekly figures
 \description{
 applies a function to all values per weekday.
 }
-

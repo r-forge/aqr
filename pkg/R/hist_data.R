@@ -7,6 +7,7 @@
 #' @param startDate the start date
 #' @param endDate the end date 
 #' @return the complete archive URL as character 
+#' @export
 buildArchiveURL <- function(con=aqInit(), seriesId, field, freq, startDate, endDate){
   url = paste("http://", con$tsHost, ":", con$tsPort,"/csv/?SERIESID=",seriesId,"&FREQ=",freq,"&FIELD=",field,"&STARTDATE=", startDate, "&ENDDATE=",endDate, sep="")
   return(url)
@@ -16,6 +17,7 @@ buildArchiveURL <- function(con=aqInit(), seriesId, field, freq, startDate, endD
 #' 
 #' @param filename where to save data to 
 #' @param historyXts the input xts object
+#' @export
 aqSaveXtsToCsv <- function(filename, historyXts){
 	write.csv2(as.data.frame(historyXts), file=filename)
 }
@@ -27,6 +29,7 @@ aqSaveXtsToCsv <- function(filename, historyXts){
 #' 
 #' @param filename the csv file which to load as XTS. 
 #' @return an XTS object
+#' @export
 aqLoadXtsFromCsv <- function(filename){
 	read.csv2(file=filename)
 }
@@ -37,6 +40,7 @@ aqLoadXtsFromCsv <- function(filename){
 #' @param start a POSIXlt start date
 #' @param end a POSIXlt end date
 #' @return instrument prices as XTS object
+#' @export
 aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
   if(is.null(instrument))
     stop("No instrument given to load. ")
@@ -58,6 +62,7 @@ aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
 #' @param useCache a boolean that says whether you want use and cache data
 #' @param cacheDir a directory name that will be used for caching if enabled
 #' @return a XTS object
+#' @export
 aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCache = FALSE, cacheDir = getwd()){  
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
@@ -121,6 +126,7 @@ aqLoadOHLC <- function(seriesId, freq, startDate, endDate, con = aqInit(), useCa
 #' @param con a connection object, will be initialized by aqInit by default
 #' @param silent whether  it should print storage diagnostics. 
 #' @param writeKey the write key, unset by default
+#' @export
 aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE, writeKey="unset"){
   for(i in colnames(data)){
     aqStoreSeriesField(seriesId, i, freq, data[,i], con, silent, writeKey);
@@ -135,6 +141,7 @@ aqStoreMatrix <- function(seriesId, freq, data, con=aqInit(), silent=FALSE, writ
 #' @param endDate an end date in date8 format (yyyyMMdd)
 #' @param con a connection object
 #' @return the loaded series as XTS object
+#' @export
 aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con = aqInit()){
 	if(is.null(con) || (is.null(con$tsHost)) || (is.null(con$tsHost))){
 		# throw a fatal error. 
@@ -161,6 +168,7 @@ aqLoadSeriesField <- function(seriesId, fieldId, freq, startDate, endDate, con =
 #' @param con a connection object, will be initialized by aqInit by default
 #' @param silent whether  it should print storage diagnostics. 
 #' @param writeKey the write key, unset by default
+#' @export
 aqStoreSeriesField <- function(seriesId, fieldId, freq, data, con = aqInit(), silent=FALSE, writeKey="unset"){
 
 	if(ncol(data)>2){
