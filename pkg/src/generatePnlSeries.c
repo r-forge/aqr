@@ -138,7 +138,9 @@ void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRu
 // trades at close 
 //' @export
 // [[Rcpp::export]]
-void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inClose, double* inRunningPosition, int* inNRows, double* inStopLoss, double* inTakeProfit, double* outReturn, double* outPosition)
+void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inClose, 
+			double* inRunningPosition, int* inNRows, double* inStopLoss, double* inTakeProfit, 
+			double* outReturn, double* outPosition, double* stopIndication)
 {
 	double formerPosition = 0.0; 
 	double currentPnl = 0.0;
@@ -192,7 +194,7 @@ void c_approximateStopLossTakeProfit(double* inHigh, double* inLow, double* inCl
 		  printf("5.1. %f\n", tempPnl);
 #endif		  
 
-		  if(tempPnl =< *inStopLoss){
+		  if(tempPnl <= *inStopLoss){
 		    // liquidate ... 
 		    outPosition[i] = 0.0; 
 		    stopFlag = 1; // set the stop flag .. 

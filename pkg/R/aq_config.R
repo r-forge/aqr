@@ -13,7 +13,7 @@ aqInit <- function(){
 	ret$tsHost = "127.0.0.1"
 	ret$tsPort = 44444
 
-  ret$openField = "OPEN"
+  	ret$openField = "OPEN"
 	ret$closeField = "CLOSE" 
 	ret$highField = "HIGH"
 	ret$lowField = "LOW"
