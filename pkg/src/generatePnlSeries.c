@@ -133,7 +133,7 @@ void c_stopLossTakeProfit(double* inBidPrices, double* inAskPrices, double* inRu
 
 }
 
-// note, this function does not support position scaling, it can only handly position side changes as long as the position size stays the same. 
+// note, this function does not support position scaling, it can only handle position side changes as long as the position size stays the same. 
 // can't handle increasing positions right now ...
 // trades at close 
 //' @export
