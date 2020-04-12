@@ -4,8 +4,14 @@
 \alias{aqStoreMatrix}
 \title{stores a matrix onto an AQ Master Server}
 \usage{
-aqStoreMatrix(seriesId, freq, data, con = aqInit(), silent = FALSE,
-  writeKey = "unset")
+aqStoreMatrix(
+  seriesId,
+  freq,
+  data,
+  con = aqInit(),
+  silent = FALSE,
+  writeKey = "unset"
+)
 }
 \arguments{
 \item{seriesId}{a series ID to store}

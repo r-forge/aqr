@@ -4,8 +4,15 @@
 \alias{approximateSLTP}
 \title{Applies an approximated StopLoss/TakeProfit strategy on an incoming pnl series.}
 \usage{
-approximateSLTP(high, low, close, takeProfit, stopLoss, runningPosition,
-  messages = FALSE)
+approximateSLTP(
+  high,
+  low,
+  close,
+  takeProfit,
+  stopLoss,
+  runningPosition,
+  messages = FALSE
+)
 }
 \value{
 the rewritten pnl series.

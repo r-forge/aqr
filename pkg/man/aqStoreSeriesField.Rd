@@ -5,8 +5,15 @@
 \title{Stores one series field to an AQ Master Server, typicall called from aqStoreSeries. 
 This function assumes that data is either a zoo object, or that is a matrix with two columns where the first column contains a time series index in NANOSECONDS(!!!)}
 \usage{
-aqStoreSeriesField(seriesId, fieldId, freq, data, con = aqInit(),
-  silent = FALSE, writeKey = "unset")
+aqStoreSeriesField(
+  seriesId,
+  fieldId,
+  freq,
+  data,
+  con = aqInit(),
+  silent = FALSE,
+  writeKey = "unset"
+)
 }
 \arguments{
 \item{seriesId}{a series name}

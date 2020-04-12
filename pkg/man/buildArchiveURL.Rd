@@ -4,8 +4,7 @@
 \alias{buildArchiveURL}
 \title{Builds an archive URL, based on connection parameters, seriesId, field, frequency and start and end date.}
 \usage{
-buildArchiveURL(con = aqInit(), seriesId, field, freq, startDate,
-  endDate)
+buildArchiveURL(con = aqInit(), seriesId, field, freq, startDate, endDate)
 }
 \arguments{
 \item{con}{connection parameters, will be initialized with aqInit() if void}

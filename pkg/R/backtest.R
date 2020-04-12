@@ -1,7 +1,5 @@
 #### backtesting functions ... 
 
-
-
 #' method to generate a pnl curve from a running position. 
 #' bids, asks and running position must have the same length. 
 #' Can compute the pnl from one price to the other, but only for one asset! 

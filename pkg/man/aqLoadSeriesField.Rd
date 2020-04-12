@@ -4,8 +4,7 @@
 \alias{aqLoadSeriesField}
 \title{Loads one series field from an AQ Master Server}
 \usage{
-aqLoadSeriesField(seriesId, fieldId, freq, startDate, endDate,
-  con = aqInit())
+aqLoadSeriesField(seriesId, fieldId, freq, startDate, endDate, con = aqInit())
 }
 \arguments{
 \item{seriesId}{the series name}

@@ -42,8 +42,9 @@ aqLoadXtsFromCsv <- function(filename){
 #' @return instrument prices as XTS object
 #' @export
 aqLoadYahooEOD <-function(instrument,start=oneMonthAgo(), end=today()){
-  if(is.null(instrument))
-    stop("No instrument given to load. ")
+  	if(is.null(instrument)) {
+    	stop("No instrument given to load. ")
+  	}
     url <- paste("http://ichart.finance.yahoo.com/table.csv?s=", instrument, "&a=",start$mon,"&b=",start$mday,"&c=",(1900+start$year),"&d=",end$mon,"&e=",end$mday,"&f=",(1900+end$year),"&g=d&ignore=.csv", sep="")
     cat("Loading data from ", url, "\n")
     rawData <-read.csv(url)

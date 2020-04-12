@@ -4,8 +4,15 @@
 \alias{aqLoadOHLC}
 \title{Loads OHLC from an AQ Master Server}
 \usage{
-aqLoadOHLC(seriesId, freq, startDate, endDate, con = aqInit(),
-  useCache = FALSE, cacheDir = getwd())
+aqLoadOHLC(
+  seriesId,
+  freq,
+  startDate,
+  endDate,
+  con = aqInit(),
+  useCache = FALSE,
+  cacheDir = getwd()
+)
 }
 \arguments{
 \item{seriesId}{a series ID}
